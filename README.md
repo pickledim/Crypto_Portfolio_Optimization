@@ -1,4 +1,3 @@
-# Crypto_Portfolio_Optimization
 # Cryptos Portfolio Management and Optimization
 
 The Cryptos class is a tool designed for cryptocurrency data analysis and portfolio optimization. It provides functionalities for scraping historical price and market cap data of cryptocurrencies, performing portfolio optimization, and validating the results.
@@ -10,7 +9,7 @@ To use the Cryptos class, follow the steps below:
 1. **Install Dependencies**: Ensure that you have the required Python libraries installed. The class depends on pandas, numpy, and requests. If you don't have these libraries, install them using pip:
 
 ```
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 2. **Import the Cryptos Class**: Import the `Cryptos` class from the script that contains the class.
