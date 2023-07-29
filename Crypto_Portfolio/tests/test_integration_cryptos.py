@@ -1,6 +1,10 @@
 import pytest
+
+
 import pandas as pd
-from Crypto_class import Cryptos  # Assuming the class is defined in the cryptos.py file
+
+
+from cryptorama import CryptoPortfolio
 
 
 # Use tmpdir fixture to create a temporary directory
@@ -14,7 +18,7 @@ def tmpdir(tmpdir_factory):
 # Fixture to create an instance of the Cryptos class before each test function
 @pytest.fixture
 def cryptos_instance(tmpdir):
-    return Cryptos(top_hundred=True, _budget=10000, _n_coins=5, _hodl=True, save_dir=tmpdir)
+    return CryptoPortfolio(top_hundred=True, _budget=10000, _n_coins=5, _hodl=True, save_dir=tmpdir)
 
 
 # Test case for the __init__ method

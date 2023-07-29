@@ -14,7 +14,7 @@ from Crypto_Portfolio.params import BASE_DIR
 base_dir = BASE_DIR
 
 
-class Cryptos:
+class CryptoPortfolio:
     """
     A class for performing cryptocurrency data analysis and portfolio optimization.
 
@@ -86,6 +86,7 @@ class Cryptos:
         self.df_prices_past = pd.DataFrame()
         self.portfolio_from_past = pd.DataFrame()
         self.portfolio = pd.DataFrame()
+
         self.stablecoins = ["USDT", "USDC", "CUSDC", "BUSD", "UST", "PAX", "DAI", "CDAI",
                             "HUSD", "TUSD", "USDN", "CUSDT", "USDP"]
         self.shitcoins = ["SHIB", "DOGE", "XDC", "LEO"]
@@ -296,6 +297,48 @@ class Cryptos:
         self.portfolio = pd.DataFrame({"Coin": coins_list, "Amount": amount_list, "n_coins": n_coins_list})
         self.portfolio.sort_values(by=["Amount"], ascending=False, inplace=True)
 
+    def data_pipeline(self):
+        """
+        Run the data pipeline to scrape cryptocurrency price data and market cap data.
+
+        This method calls the 'get_prices_df()' and 'get_market_cap_df()' methods to scrape the historical price
+        data and market cap data of selected coins and saves the data to CSV files for future use.
+        """
+
+        self.get_prices_df()
+        self.get_market_cap_df()
+
+    def post_pros_pipeline(self, _n_coins, _n_days, _mu_method, _cov_method, _obj_function, _drop=False,
+                               _scrap=False):
+        """
+        Run the post-processing pipeline to perform portfolio optimization and validation.
+
+        This method calls the 'validate_from_past()' and 'optimize_portfolio()' methods to perform portfolio
+        optimization based on past data and create the optimized portfolio DataFrame.
+        """
+
+        self.validate_from_past(_n_coins, _n_days, _mu_method, _cov_method, _obj_function, _drop=False, _scrap=False)
+        self.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_function, _drop=False, _scrap=False)
+
+    def run_all(self, file, _n_coins, _n_days, _mu_method, _cov_method, _obj_function, _drop=False, _scrap=False):
+        """
+        Run the entire pipeline for cryptocurrency data analysis and portfolio optimization.
+
+        This method calls the following methods in sequence:
+        1. 'regex_coins()': Extracts crypto coins from a file using regex.
+        2. 'get_prices()': Scrapes the historical price data of selected coins and creates a DataFrame.
+        3. 'get_market_cap_df()': Creates the DataFrame of all the coins' market cap.
+        4. 'validate_from_past()': Performs portfolio optimization based on past data and validates the results.
+        5. 'optimize_portfolio()': Performs portfolio optimization and creates the optimized portfolio DataFrame.
+        """
+
+        self.regex_coins(file)
+        self.get_prices()
+        self.get_prices()
+        self.get_market_cap_df()
+        self.validate_from_past()
+        self.optimize_portfolio()
+
 
 if __name__ == "__main__":
     top_100 = True
@@ -309,7 +352,7 @@ if __name__ == "__main__":
     hodl = True
     scrap = False
     save_to = ""
-    crypto_class_20c = Cryptos(top_100, budget, n_coins, hodl, save_dir=save_to)
+    crypto_class_20c = CryptoPortfolio(top_100, budget, n_coins, hodl, save_dir=save_to)
 
     crypto_class_20c.get_prices_df()
     crypto_class_20c.get_market_cap_df()
