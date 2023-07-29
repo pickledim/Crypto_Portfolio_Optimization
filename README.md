@@ -87,14 +87,14 @@ crypto_portfolio.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_func
 Here is an example of how to use the Cryptos class:
 
 ```python
-from Crypto_portfolio.src import Cryptos
+from Crypto_portfolio.src import cryptorama
 
 top_hundred = True
 budget = 1000
 n_coins = 10
 hodl = True
 save_dir = "/path/to/save/data"
-crypto_portfolio = Cryptos(top_hundred, budget, n_coins, hodl, save_dir)
+crypto_portfolio = cryptorama.CryptoPortfolio(top_hundred, budget, n_coins, hodl, save_dir)
 
 # Scrape historical price and market cap data
 crypto_portfolio.get_prices_df()
@@ -111,4 +111,4 @@ crypto_portfolio.validate_from_past(n_coins, n_days, mu_method, cov_method, obj_
 crypto_portfolio.optimize_portfolio(n_coins, mu_method, cov_method, obj_function)
 ```
 
-The Cryptos class simplifies cryptocurrency data analysis and portfolio optimization, making it easier to manage your crypto investments effectively. Happy investing!
+The CryptoPortfolio simplifies cryptocurrency data analysis and portfolio optimization, making it easier to manage your crypto investments effectively. Happy investing!
