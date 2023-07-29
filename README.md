@@ -4,7 +4,7 @@ The Cryptos class is a tool designed for cryptocurrency data analysis and portfo
 
 ## Getting Started
 
-To use the Cryptos class, follow the steps below:
+To use the CryptoPortfolio, follow the steps below:
 
 1. **Install Dependencies**: Ensure that you have the required Python libraries installed. The class depends on pandas, numpy, and requests. If you don't have these libraries, install them using pip:
 
@@ -15,7 +15,7 @@ pip install -r requirements.txt
 2. **Import the Cryptos Class**: Import the `Cryptos` class from the script that contains the class.
 
 ```python
-from Crypto_portfolio.src import Cryptos
+from Crypto_portfolio.src import CryptoPortfolio
 ```
 
 3. **Initialize the Cryptos Object**: Create an instance of the Cryptos class by providing the necessary parameters.
@@ -26,7 +26,7 @@ budget = 1000  # Total budget for the portfolio.
 n_coins = 10  # Number of coins to consider for portfolio optimization.
 hodl = True  # Set to True to hold the portfolio, False to trade after one year of investment.
 save_dir = "/path/to/save/data"  # Directory to save the scraped data.
-crypto_portfolio = Cryptos(top_hundred, budget, n_coins, hodl, save_dir)
+crypto_portfolio = CryptoPortfolio(top_hundred, budget, n_coins, hodl, save_dir)
 ```
 
 ## Functionality

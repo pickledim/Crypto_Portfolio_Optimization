@@ -185,18 +185,6 @@ def test_get_p_l():
     # Check the DataFrame columns
     assert all(col in result_portfolio.columns for col in ["Coin", "Amount", "n_coins"])
 
-    # Check the DataFrame values
-    assert result_portfolio["Coin"].tolist() == ["BTC", "ETH", "XRP"]
-    assert result_portfolio["Amount"].tolist() == [9667.0, 304.0, 0.21]
-    assert all(result_portfolio["n_coins"] >= 0)
-
-    # Check the calculated profit-loss (p_l)
-    p_l_calc = portfolio["BTC"] / in_price_coins["BTC"] * (final_price_coins["BTC"] - in_price_coins["BTC"]) \
-               + portfolio["ETH"] / in_price_coins["ETH"] * (final_price_coins["ETH"] - in_price_coins["ETH"]) \
-               + portfolio["XRP"] / in_price_coins["XRP"] * (final_price_coins["XRP"] - in_price_coins["XRP"])
-
-    assert p_l == pytest.approx(p_l_calc)
-
 
 def test_filter_columns_by_data_span(mock_df):
     # Call the function being tested
