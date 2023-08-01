@@ -44,12 +44,9 @@ class CryptoPortfolio:
         top_hundred (bool): Flag to choose between top 100 and top 1000 coins.
         _budget (float): The total budget for the portfolio.
         _n_coins (int): The number of coins to consider for portfolio optimization.
-        _hodl (bool): Flag to indicate whether to hold the portfolio or trade after one year of investment.
         coins (list): List of cryptocurrency coins.
         csv_name (str): Name of the CSV file to save the scraped data.
         budget (float): The total budget for the portfolio.
-        hodl (bool): Flag to indicate whether to hold the portfolio or trade after one year of investment.
-        _n_coins (int): The number of coins to consider for portfolio optimization.
         p_l (int): Profit-loss of the selected coins.
         selected_coins_of_past (list): List of selected coins for the past portfolio.
         selected_coins (list): List of selected coins for the current portfolio.
@@ -62,7 +59,7 @@ class CryptoPortfolio:
         portfolio (pd.DataFrame): DataFrame representing the current optimized portfolio.
     """
 
-    def __init__(self, top_hundred, _budget, _n_coins, _hodl, save_dir):
+    def __init__(self, top_hundred, _budget, _n_coins, save_dir):
         """
         Initialize the Cryptos portfolio management object.
 
@@ -75,9 +72,6 @@ class CryptoPortfolio:
 
             :param _n_coins: Number of coins to consider for portfolio optimization.
             :type _n_coins: int
-
-            :param _hodl: Flag to determine whether to hodl or trade (check prices after one year of investment).
-            :type _hodl: bool
         """
 
         if top_hundred:
@@ -95,7 +89,6 @@ class CryptoPortfolio:
 
         self.save_dir = save_dir
         self.budget = _budget
-        self.hodl = _hodl
         self._n_coins = _n_coins
         self.top_hundred = top_hundred
 
@@ -245,13 +238,14 @@ class CryptoPortfolio:
 
         self.df_prices = self.df_prices[coins]
         
-        if self.hodl:
-            # if you hodl check the prices of today
-            prices_now = self.df_prices.iloc[0, :]
-        else:
-            # if you trade check the prices after one year of the investment
-            prices_now = self.df_prices.iloc[_n_days - 365, :]
+        # if self.hodl:
+        # if you hodl check the prices of today
+        #     prices_now = self.df_prices.iloc[0, :]
+        # else:
+        #     # if you trade check the prices after one year of the investment
+        #     prices_now = self.df_prices.iloc[_n_days - 365, :]
 
+        prices_now = self.df_prices.iloc[0, :]
         # take the prices up to n_day
         self.df_prices_past = self.df_prices.iloc[_n_days:, :]
         # take the prices of the n_day

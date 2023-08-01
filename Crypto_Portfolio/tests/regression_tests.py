@@ -19,7 +19,7 @@ def crypto_df():
 
 @pytest.fixture
 def cryptos_instance():
-    return CryptoPortfolio(top_hundred=True, _budget=10000, _n_coins=10, _hodl=True, save_dir="./tests/data")
+    return CryptoPortfolio(top_hundred=True, _budget=10000, _n_coins=10, save_dir="./tests/data")
 
 
 def test_portfolio_optimization(crypto_df):
