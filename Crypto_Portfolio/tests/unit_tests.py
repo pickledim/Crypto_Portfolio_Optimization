@@ -5,7 +5,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-from generic_algorithms import remove_coins, __datetime, scrap_coin, regularize, \
+from generic_algorithms import remove_coins, convert_to_datetime, scrap_coin, regularize, \
     portfolio_optimization, get_p_l, filter_columns_by_data_span
 
 
@@ -37,22 +37,22 @@ def test_datetime_conversion():
     # Test case 1: Valid date string
     date_str1 = "2023-07-27"
     expected_date1 = datetime(2023, 7, 27)
-    assert __datetime(date_str1) == expected_date1
+    assert convert_to_datetime(date_str1) == expected_date1
 
     # Test case 2: Another valid date string
     date_str2 = "2021-09-15"
     expected_date2 = datetime(2021, 9, 15)
-    assert __datetime(date_str2) == expected_date2
+    assert convert_to_datetime(date_str2) == expected_date2
 
     # Test case 3: Invalid date string format (should raise ValueError)
     date_str3 = "2023/07/27"
     with pytest.raises(ValueError):
-        __datetime(date_str3)
+        convert_to_datetime(date_str3)
 
     # Test case 4: Invalid date (day 32, should raise ValueError)
     date_str4 = "2023-07-32"
     with pytest.raises(ValueError):
-        __datetime(date_str4)
+        convert_to_datetime(date_str4)
 
 
 def test_remove_coins():
