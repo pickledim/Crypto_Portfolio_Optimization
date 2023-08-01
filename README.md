@@ -79,7 +79,7 @@ The `optimize_portfolio()` method performs portfolio optimization and creates th
 - `_scrap`: Boolean flag indicating whether to re-scrape data or use existing data. Default is False.
 
 ```python
-crypto_portfolio.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_function, _drop=False, _scrap=False)
+crypto_portfolio.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_function, _compounding=False, _scrap=False)
 ```
 
 ## Example Usage
@@ -92,9 +92,9 @@ from Crypto_portfolio.src import cryptorama
 top_hundred = True
 budget = 1000
 n_coins = 10
-hodl = True
+compounding = True
 save_dir = "/path/to/save/data"
-crypto_portfolio = cryptorama.CryptoPortfolio(top_hundred, budget, n_coins, hodl, save_dir)
+crypto_portfolio = cryptorama.CryptoPortfolio(top_hundred, budget, n_coins, save_dir)
 
 # Scrape historical price and market cap data
 crypto_portfolio.get_prices_df()
