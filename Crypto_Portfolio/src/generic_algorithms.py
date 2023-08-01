@@ -1,16 +1,19 @@
 from datetime import datetime
 
+
 import numpy as np
 import pandas as pd
 
-from pypfopt.efficient_frontier import EfficientFrontier
-from pypfopt import expected_returns
+
 from pypfopt import risk_models
+from pypfopt import expected_returns
+from pypfopt.efficient_frontier import EfficientFrontier
+
 
 from cryptocmd import CmcScraper
 
 
-def __datetime(date_str):
+def convert_to_datetime(date_str):
     """
     Converts a date string to a datetime object.
 
@@ -136,8 +139,8 @@ def filter_columns_by_data_span(data, min_data_span_days=60):
         pos1 = data[token].last_valid_index()
         pos2 = data[token].first_valid_index()
         if pos1 is not None and pos2 is not None:
-            start = __datetime(pos1)
-            end = __datetime(pos2)
+            start = convert_to_datetime(pos1)
+            end = convert_to_datetime(pos2)
             delta = end - start
             if delta.days < min_data_span_days:
                 columns_to_drop.append(token)
@@ -149,7 +152,7 @@ def filter_columns_by_data_span(data, min_data_span_days=60):
     return data_filtered
 
 
-def portfolio_optimization(df, selected_coins, _budget, _mu_method, _cov_method, _obj_function, _drop=False):
+def portfolio_optimization(df, selected_coins, _budget, _mu_method, _cov_method, _obj_function, _compounding=False):
     """
     Perform portfolio optimization using the Efficient Frontier approach.
 
@@ -179,7 +182,7 @@ def portfolio_optimization(df, selected_coins, _budget, _mu_method, _cov_method,
         Possible values: "quadratic", "sharpe", "min_volat".
         :type _obj_function: str
 
-        :param _drop: Boolean flag indicating whether to drop missing values from the DataFrame. Default is False.
+        :param _compounding: Boolean flag indicating whether to compound the mean. Default is False.
         :type _drop: bool
 
     Returns:
@@ -205,13 +208,13 @@ def portfolio_optimization(df, selected_coins, _budget, _mu_method, _cov_method,
     # keep the coins that are in the market for at least 2 months
     df = filter_columns_by_data_span(df, min_data_span_days=60)
 
-    if _drop:
-        df.dropna(inplace=True)
+    # if _drop:
+    #     df.dropna(inplace=True)
 
     df = df.sort_index(ascending=True)
 
     # Calculate expected returns and sample covariance
-    mu = mu_mapping[_mu_method](df, compounding=True, frequency=365)
+    mu = mu_mapping[_mu_method](df, compounding=_compounding, frequency=365)
     mu.replace([np.inf, -np.inf], np.nan, inplace=True)
     mu.dropna(inplace=True)
     # print(mu)

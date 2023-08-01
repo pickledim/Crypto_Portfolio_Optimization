@@ -1,12 +1,12 @@
 import pytest
 
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
-from generic_algorithms import portfolio_optimization, get_p_l
 from cryptorama import CryptoPortfolio
+from generic_algorithms import portfolio_optimization, get_p_l
 
 
 @pytest.fixture
@@ -31,7 +31,7 @@ def test_portfolio_optimization(crypto_df):
     obj_function = "sharpe"
 
     sample_portfolio, mu, weights = portfolio_optimization(crypto_df, selected_coins, budget, mu_method, cov_method,
-                                                           obj_function, _drop=False)
+                                                           obj_function, _compounding=True)
 
     assert list(sample_portfolio.keys()) == ["ETH", "SOL"]
     assert sample_portfolio["ETH"] == 9737.9
@@ -44,7 +44,7 @@ def test_portfolio_optimization(crypto_df):
 
     obj_function = "min_volat"
     sample_portfolio, mu, weights = portfolio_optimization(crypto_df, selected_coins, budget, mu_method, cov_method,
-                                                           obj_function, _drop=False)
+                                                           obj_function, _compounding=True)
 
     assert list(sample_portfolio.keys()) == ["BTC", "ETH"]
     assert sample_portfolio["BTC"] == 9809.5
@@ -86,10 +86,10 @@ def test_post_pros_pipeline(cryptos_instance):
     mu_method = "mean"
     cov_method = "exp"
     obj_function = "sharpe"
-    drop = False,
+    compounding = False,
     scrap = False
 
-    cryptos_instance.post_pros_pipeline(n_coins, n_days, mu_method, cov_method, obj_function, drop, scrap)
+    cryptos_instance.post_pros_pipeline(n_coins, n_days, mu_method, cov_method, obj_function, compounding, scrap)
 
     assert cryptos_instance.portfolio["Coin"][0] == "BNB"
     assert cryptos_instance.portfolio["Amount"][0] == 10e3
@@ -102,7 +102,7 @@ def test_post_pros_pipeline(cryptos_instance):
     assert np.isclose(cryptos_instance.p_l, 112576.335)
 
     obj_function = "min_volat"
-    cryptos_instance.post_pros_pipeline(n_coins, n_days, mu_method, cov_method, obj_function, drop, scrap)
+    cryptos_instance.post_pros_pipeline(n_coins, n_days, mu_method, cov_method, obj_function, compounding, scrap)
 
     assert np.all(cryptos_instance.portfolio["Coin"].values == ['TRX', 'BTC', 'BNB'])
     assert np.all(np.isclose(cryptos_instance.portfolio["Amount"].values,
@@ -120,7 +120,7 @@ def test_post_pros_pipeline(cryptos_instance):
     assert np.isclose(cryptos_instance.p_l, 19242.428690850073)
 
     obj_function = "quadratic"
-    cryptos_instance.post_pros_pipeline(n_coins, n_days, mu_method, cov_method, obj_function, drop, scrap)
+    cryptos_instance.post_pros_pipeline(n_coins, n_days, mu_method, cov_method, obj_function, compounding, scrap)
 
     assert cryptos_instance.portfolio["Coin"][0] == "BNB"
     assert cryptos_instance.portfolio["Amount"][0] == 10e3
@@ -131,3 +131,51 @@ def test_post_pros_pipeline(cryptos_instance):
     assert np.isclose(cryptos_instance.portfolio_from_past["n_coins"][0], 509.67548)
 
     assert np.isclose(cryptos_instance.p_l, 112576.335)
+
+
+def test_specific_dates(cryptos_instance):
+    n_coins = 10
+    buy_date = 365 * 3
+    sell_date = 365 * 2
+    mu_method = "mean"
+    cov_method = "exp"
+    obj_function = "sharpe"
+    compounding = True,
+
+    cryptos_instance.validate_from_past_specific_dates(n_coins, buy_date, sell_date, mu_method, cov_method,
+                                                       obj_function, compounding, _scrap=False)
+
+    assert np.all(cryptos_instance.portfolio_from_past_specific["Coin"].values == ['BNB'])
+    assert np.all(
+        np.isclose(cryptos_instance.portfolio_from_past_specific["Amount"].values,
+                   np.array([10e3])))
+    assert np.all(np.isclose(cryptos_instance.portfolio_from_past_specific["n_coins"].values,
+                             np.array([509.67548028694387])))
+
+    assert np.isclose(cryptos_instance.p_l_specific, 149835.55794035515)
+
+    obj_function = "min_volat"
+    cryptos_instance.validate_from_past_specific_dates(n_coins, buy_date, sell_date, mu_method, cov_method,
+                                                       obj_function, compounding, _scrap=False)
+
+    assert np.all(cryptos_instance.portfolio_from_past_specific["Coin"].values == ['BTC'])
+    assert np.all(
+        np.isclose(cryptos_instance.portfolio_from_past_specific["Amount"].values,
+                   np.array([10e3])))
+    assert np.all(np.isclose(cryptos_instance.portfolio_from_past_specific["n_coins"].values,
+                             np.array([0.9098457998963002])))
+
+    assert np.isclose(cryptos_instance.p_l_specific, 25854.23974078082)
+
+    obj_function = "quadratic"
+    cryptos_instance.validate_from_past_specific_dates(n_coins, buy_date, sell_date, mu_method, cov_method,
+                                                       obj_function, compounding, _scrap=False)
+
+    assert np.all(cryptos_instance.portfolio_from_past_specific["Coin"].values == ['BNB'])
+    assert np.all(
+        np.isclose(cryptos_instance.portfolio_from_past_specific["Amount"].values,
+                   np.array([10e3])))
+    assert np.all(np.isclose(cryptos_instance.portfolio_from_past_specific["n_coins"].values,
+                             np.array([509.67548028694387])))
+
+    assert np.isclose(cryptos_instance.p_l_specific, 149835.55794035515)

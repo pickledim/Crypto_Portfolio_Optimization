@@ -2,6 +2,7 @@ import os
 import re
 import time
 import pickle
+from datetime import timedelta
 
 
 import pandas as pd
@@ -12,6 +13,27 @@ import Crypto_Portfolio.src.generic_algorithms as algos
 from Crypto_Portfolio.params import BASE_DIR
 
 base_dir = BASE_DIR
+
+
+def remove_unwanted_coins(coins_list):
+    """
+    Remove unwanted coins from the list of coins.
+
+    This function removes stablecoins, shitty coins, and coins that cannot be bought.
+
+    :param coins_list: List of coins to filter.
+    :type coins_list: list[str]
+    :return: List of coins after filtering.
+    :rtype: list[str]
+    """
+    stablecoins = ["USDT", "USDC", "CUSDC", "BUSD", "UST", "PAX", "DAI", "CDAI", "HUSD", "TUSD", "USDN", "CUSDT",
+                   "USDP"]
+    shitty_coins = ["SHIB", "DOGE", "XDC", "LEO"]
+
+    coins_list = algos.remove_coins(stablecoins, coins_list)
+    coins_list = algos.remove_coins(shitty_coins, coins_list)
+
+    return coins_list
 
 
 class CryptoPortfolio:
@@ -76,20 +98,22 @@ class CryptoPortfolio:
         self.hodl = _hodl
         self._n_coins = _n_coins
         self.top_hundred = top_hundred
-        self.p_l = int()
-        self.selected_coins_of_past = list()
-        self.selected_coins = list()
+
+        self.p_l = float()
+        self.p_l_specific = float()
+
         self.market_cap = list()
+        self.selected_coins = list()
+        self.selected_coins_of_past = list()
+
         self.date = pd.DataFrame()
+        self.portfolio = pd.DataFrame()
         self.df_prices = pd.DataFrame()
         self.df_market_cap = pd.DataFrame()
         self.df_prices_past = pd.DataFrame()
+        self.df_prices_specific = pd.DataFrame()
         self.portfolio_from_past = pd.DataFrame()
-        self.portfolio = pd.DataFrame()
-
-        self.stablecoins = ["USDT", "USDC", "CUSDC", "BUSD", "UST", "PAX", "DAI", "CDAI",
-                            "HUSD", "TUSD", "USDN", "CUSDT", "USDP"]
-        self.shitcoins = ["SHIB", "DOGE", "XDC", "LEO"]
+        self.portfolio_from_past_specific = pd.DataFrame()
 
     def regex_coins(self, file):
         """
@@ -131,6 +155,8 @@ class CryptoPortfolio:
             # assign the BTC date column as the date column of the prices df (BTC is the oldest)
             if coin == "BTC":
                 self.date = df["Date"]
+                # Use lambda function to apply __datetime to each element in the "Date" column
+                # self.date = self.date.apply(lambda date_str: algos.convert_to_datetime(date_str))
 
         # =====================================================================
         # Post Pros
@@ -166,12 +192,13 @@ class CryptoPortfolio:
         self.df_market_cap = pd.concat(self.market_cap, axis=1)
         self.df_market_cap.columns = self.coins
         self.df_market_cap["Date"] = self.date
+
         self.df_market_cap = self.df_market_cap.set_index(self.df_market_cap["Date"].values)
         self.df_market_cap.drop(columns=["Date"], axis=1, inplace=True)
 
         self.df_market_cap.to_csv(f"{self.save_dir}/{self.csv_name}_market_cap.csv")
 
-    def validate_from_past(self, _n_coins, _n_days, _mu_method, _cov_method, _obj_function, _drop, _scrap=False):
+    def validate_from_past(self, _n_coins, _n_days, _mu_method, _cov_method, _obj_function, _compounding, _scrap=False):
         """
         Performs portfolio optimization based on past data and validates the results.
 
@@ -192,8 +219,9 @@ class CryptoPortfolio:
             Possible values: "quadratic", "sharpe", "min_volat".
             :type _obj_function: str
 
-            :param _drop: Boolean flag indicating whether to drop missing values from the DataFrame. Default is False.
-            :type _drop: bool
+            :param _compounding: Boolean flag indicating whether to drop missing values from the DataFrame.
+            Default is False.
+            :type _compounding: bool
 
             :param _scrap: Boolean flag indicating whether to re-scrap data or use existing data.
             :type _scrap: bool
@@ -210,9 +238,8 @@ class CryptoPortfolio:
         self.selected_coins_of_past = list(coins.index)  # store the names in a list
 
         # remove the stable coins, the shitty coins and the ones that you cannot buy
-        self.selected_coins_of_past = algos.remove_coins(self.stablecoins, self.selected_coins_of_past)
-        self.selected_coins_of_past = algos.remove_coins(self.shitcoins, self.selected_coins_of_past)
-        
+        self.selected_coins_of_past = remove_unwanted_coins(self.selected_coins_of_past)
+
         coin_list = self.df_prices.columns.tolist()
         coins = list(set(coin_list).intersection(self.selected_coins_of_past))
 
@@ -233,12 +260,94 @@ class CryptoPortfolio:
         # portfolio optimization
         self.portfolio_from_past, mu, weights = algos.portfolio_optimization(self.df_prices_past, coins, self.budget,
                                                                              _mu_method, _cov_method, _obj_function,
-                                                                             _drop)
+                                                                             _compounding)
 
         # get profit_loss
         self.portfolio_from_past, self.p_l = algos.get_p_l(self.portfolio_from_past, prices_past, prices_now)
 
-    def optimize_portfolio(self, _n_coins, _mu_method, _cov_method, _obj_function, _drop=False, _scrap=False):
+    def validate_from_past_specific_dates(self, _n_coins, buy_date, sell_date, _mu_method, _cov_method, _obj_function,
+                                          _compounding, _scrap=False):
+        """
+            Perform portfolio optimization based on historical data within specific buy and sell dates.
+
+            This method optimizes the cryptocurrency portfolio based on historical price data of selected coins,
+            considering a specific buy date and sell date. It calculates the optimized portfolio, expected returns,
+            and weights of each asset.
+
+            Parameters:
+                :param _n_coins: Number of coins to consider for portfolio optimization.
+                :type _n_coins: int
+
+                :param buy_date: Number of days from the current date to the buy date for the historical data.
+                :type buy_date: int
+
+                :param sell_date: Number of days from the current date to the sell date for the historical data.
+                :type sell_date: int
+
+                :param _mu_method: Method for calculating expected returns. Possible values: "mean", "exp", "capm".
+                :type _mu_method: str
+
+                :param _cov_method: Method for calculating covariance. Possible values: "sample", "exp".
+                :type _cov_method: str
+
+                :param _obj_function: Objective function for optimization.
+                Possible values: "quadratic", "sharpe", "min_volat"
+                :type _obj_function: str
+
+                :param _compounding: Boolean flag indicating whether to apply compounding to returns over time.
+                :type _compounding: bool
+
+                :param _scrap: Boolean flag indicating whether to re-scrape data or use existing data.
+                :type _scrap: bool, optional
+
+            Returns:
+                :return: None
+            """
+
+        if not _scrap:
+            self.df_prices = pd.read_csv(f"{self.save_dir}/{self.csv_name}.csv", index_col=0)
+
+        df_mc = pd.read_csv(f"{self.save_dir}/{self.csv_name}_market_cap.csv", index_col=0)
+        df_mc.index = pd.Series(df_mc.index).apply(lambda date_str: algos.convert_to_datetime(date_str))
+        self.df_prices.index = pd.Series(self.df_prices.index).apply(lambda date_str:
+                                                                     algos.convert_to_datetime(date_str))
+
+        current_date = df_mc.iloc[0].name
+        buy_timestamp = current_date - timedelta(days=buy_date)
+        sell_timestamp = current_date - timedelta(days=sell_date)
+
+        df_365 = df_mc.loc[buy_timestamp:, :].iloc[0, :].T  # take the market cap of only that day
+        df_365.dropna(inplace=True)
+        coins = df_365.nlargest(_n_coins, )  # keep the n largest coins in terms of market cap
+        self.selected_coins_of_past = list(coins.index)  # store the names in a list
+
+        # remove the stable coins, the shitty coins and the ones that you cannot buy
+        self.selected_coins_of_past = remove_unwanted_coins(self.selected_coins_of_past)
+
+        coin_list = self.df_prices.columns.tolist()
+        coins = list(set(coin_list).intersection(self.selected_coins_of_past))
+
+        self.df_prices = self.df_prices[coins]
+
+        # take the prices up to n_day
+        self.df_prices_specific = self.df_prices.loc[sell_timestamp:, :]
+
+        sell_prices = self.df_prices_specific.loc[sell_timestamp, :]
+        buy_prices = self.df_prices_specific.loc[buy_timestamp, :]
+
+        self.df_prices_specific.index = self.df_prices_specific.index.strftime("%Y-%m-%d")
+
+        # portfolio optimization
+        self.portfolio_from_past_specific, mu, weights = algos.portfolio_optimization(self.df_prices_specific, coins,
+                                                                                      self.budget, _mu_method,
+                                                                                      _cov_method, _obj_function,
+                                                                                      _compounding=_compounding)
+
+        # get profit_loss
+        self.portfolio_from_past_specific, self.p_l_specific = algos.get_p_l(self.portfolio_from_past_specific,
+                                                                             buy_prices, sell_prices)
+
+    def optimize_portfolio(self, _n_coins, _mu_method, _cov_method, _obj_function, _compounding=False, _scrap=False):
         """
         Performs portfolio optimization and creates the optimized portfolio DataFrame.
 
@@ -254,8 +363,8 @@ class CryptoPortfolio:
         :param _obj_function: Objective function for optimization. Possible values: "quadratic", "sharpe", "min_volat".
         :type _obj_function: str
 
-        :param _drop: Boolean flag indicating whether to drop missing values from the DataFrame. Default is False.
-        :type _drop: bool
+        :param _compounding: Boolean flag indicating whether to compound on mu. Default is False.
+        :type _compounding: bool
 
         :param _scrap: Boolean flag indicating whether to re-scrap data or use existing data.
         :type _scrap: bool
@@ -274,15 +383,14 @@ class CryptoPortfolio:
         self.selected_coins = list(coins.index)
 
         # remove the stable coins, the shitty coins and the ones that you cannot buy
-        self.selected_coins = algos.remove_coins(self.stablecoins, self.selected_coins)
-        self.selected_coins = algos.remove_coins(self.shitcoins, self.selected_coins)
+        self.selected_coins = remove_unwanted_coins(self.selected_coins)
 
         coin_list = self.df_prices.columns.tolist()
         coins = list(set(coin_list).intersection(self.selected_coins))
         self.selected_coins = coins
 
         portfolio, mu, weights = algos.portfolio_optimization(self.df_prices, self.selected_coins, self.budget,
-                                                              _mu_method, _cov_method, _obj_function, _drop)
+                                                              _mu_method, _cov_method, _obj_function, _compounding)
 
         coins_list = list()
         amount_list = list()
@@ -308,8 +416,8 @@ class CryptoPortfolio:
         self.get_prices_df()
         self.get_market_cap_df()
 
-    def post_pros_pipeline(self, _n_coins, _n_days, _mu_method, _cov_method, _obj_function, _drop=False,
-                               _scrap=False):
+    def post_pros_pipeline(self, _n_coins, _n_days, _mu_method, _cov_method, _obj_function, _compounding=False,
+                           _scrap=False):
         """
         Run the post-processing pipeline to perform portfolio optimization and validation.
 
@@ -317,10 +425,13 @@ class CryptoPortfolio:
         optimization based on past data and create the optimized portfolio DataFrame.
         """
 
-        self.validate_from_past(_n_coins, _n_days, _mu_method, _cov_method, _obj_function, _drop=False, _scrap=False)
-        self.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_function, _drop=False, _scrap=False)
+        self.validate_from_past(_n_coins, _n_days, _mu_method, _cov_method, _obj_function, _compounding=_compounding,
+                                _scrap=False)
+        self.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_function, _compounding=_compounding,
+                                _scrap=False)
 
-    def run_all(self, file, _n_coins, _n_days, _mu_method, _cov_method, _obj_function, _drop=False, _scrap=False):
+    def run_all(self, file, _n_coins, _n_days, sell_date, _mu_method, _cov_method, _obj_function, _compounding=False,
+                _scrap=False):
         """
         Run the entire pipeline for cryptocurrency data analysis and portfolio optimization.
 
@@ -333,11 +444,12 @@ class CryptoPortfolio:
         """
 
         self.regex_coins(file)
-        self.get_prices()
-        self.get_prices()
+        self.get_prices_df()
         self.get_market_cap_df()
-        self.validate_from_past()
-        self.optimize_portfolio()
+        self.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_function, _compounding=False, _scrap=False)
+        self.validate_from_past(_n_coins, _n_days, _mu_method, _cov_method, _obj_function, _compounding, _scrap=False)
+        self.validate_from_past_specific_dates(_n_coins, _n_days, sell_date, _mu_method, _cov_method, _obj_function,
+                                               _compounding, _scrap=False)
 
 
 if __name__ == "__main__":
@@ -351,12 +463,12 @@ if __name__ == "__main__":
     budget = 100
     hodl = True
     scrap = False
-    save_to = ""
+    save_to = "./new_data"
     crypto_class_20c = CryptoPortfolio(top_100, budget, n_coins, hodl, save_dir=save_to)
 
-    crypto_class_20c.get_prices_df()
-    crypto_class_20c.get_market_cap_df()
-    crypto_class_20c.validate_from_past(n_coins, n_days, mu_method, cov_method, obj_function, drop, scrap)
+    # crypto_class_20c.get_prices_df()
+    # crypto_class_20c.get_market_cap_df()
+    # crypto_class_20c.validate_from_past(n_coins, n_days, mu_method, cov_method, obj_function, drop, scrap)
     crypto_class_20c.optimize_portfolio(n_coins, mu_method, cov_method, obj_function, drop, scrap)
     print(f"\nn_coins={n_coins}\n")
     print(crypto_class_20c.portfolio)
