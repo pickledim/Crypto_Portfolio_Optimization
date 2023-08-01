@@ -1,6 +1,6 @@
 # Cryptos Portfolio Management and Optimization
 
-The Cryptos class is a tool designed for cryptocurrency data analysis and portfolio optimization. It provides functionalities for scraping historical price and market cap data of cryptocurrencies, performing portfolio optimization, and validating the results.
+The Crypto Portfolio Optimization is a tool designed for cryptocurrency data analysis and portfolio optimization. It provides functionalities for scraping historical price and market cap data of cryptocurrencies, performing portfolio optimization, and validating the results.
 
 ## Getting Started
 
@@ -12,21 +12,20 @@ To use the CryptoPortfolio, follow the steps below:
 pip install -r requirements.txt
 ```
 
-2. **Import the Cryptos Class**: Import the `Cryptos` class from the script that contains the class.
+2. **Import the CryptoPortdolio**: Import the `CryptoPortfolio` class from the script that contains the class.
 
 ```python
-from Crypto_portfolio.src import CryptoPortfolio
+from Crypto_portfolio.src.cryptorama import CryptoPortfolio
 ```
 
-3. **Initialize the Cryptos Object**: Create an instance of the Cryptos class by providing the necessary parameters.
+3. **Initialize the CryptoPortfolio Object**: Create an instance of the CryptoPortfolio class by providing the necessary parameters.
 
 ```python
 top_hundred = True  # Set to True to consider the top 100 coins, False to consider all cryptocurrencies.
 budget = 1000  # Total budget for the portfolio.
 n_coins = 10  # Number of coins to consider for portfolio optimization.
-hodl = True  # Set to True to hold the portfolio, False to trade after one year of investment.
 save_dir = "/path/to/save/data"  # Directory to save the scraped data.
-crypto_portfolio = CryptoPortfolio(top_hundred, budget, n_coins, hodl, save_dir)
+crypto_portfolio = CryptoPortfolio(top_hundred, budget, n_coins, save_dir)
 ```
 
 ## Functionality
@@ -60,11 +59,11 @@ The `validate_from_past()` method performs portfolio optimization based on past 
 - `_mu_method`: Method for calculating expected returns. Possible values: "mean", "exp", "capm".
 - `_cov_method`: Method for calculating covariance. Possible values: "sample", "exp".
 - `_obj_function`: Objective function for optimization. Possible values: "quadratic", "sharpe", "min_volat".
-- `_drop`: Boolean flag indicating whether to drop missing values from the DataFrame. Default is False.
+- `_compounding`: Boolean flag indicating whether to compound the mean.
 - `_scrap`: Boolean flag indicating whether to re-scrape data or use existing data. Default is False.
 
 ```python
-crypto_portfolio.validate_from_past(_n_coins, _n_days, _mu_method, _cov_method, _obj_function, _drop, _scrap=False)
+crypto_portfolio.validate_from_past(_n_coins, _n_days, _mu_method, _cov_method, _obj_function, _compounding, _scrap=False)
 ```
 
 #### 2.2 Optimize Current Portfolio
@@ -75,7 +74,7 @@ The `optimize_portfolio()` method performs portfolio optimization and creates th
 - `_mu_method`: Method for calculating expected returns. Possible values: "mean", "exp", "capm".
 - `_cov_method`: Method for calculating covariance. Possible values: "sample", "exp".
 - `_obj_function`: Objective function for optimization. Possible values: "quadratic", "sharpe", "min_volat".
-- `_drop`: Boolean flag indicating whether to drop missing values from the DataFrame. Default is False.
+- `_compounding`: Boolean flag indicating whether to compound the mean.
 - `_scrap`: Boolean flag indicating whether to re-scrape data or use existing data. Default is False.
 
 ```python
@@ -87,14 +86,13 @@ crypto_portfolio.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_func
 Here is an example of how to use the Cryptos class:
 
 ```python
-from Crypto_portfolio.src import Cryptos
+from Crypto_portfolio.src.cryptorama import CryptoPortfolio
 
 top_hundred = True
 budget = 1000
 n_coins = 10
-compounding = True
 save_dir = "/path/to/save/data"
-crypto_portfolio = Cryptos(top_hundred, budget, n_coins, compounding, save_dir)
+crypto_portfolio = CryptoPortfolio(top_hundred, budget, n_coins, save_dir)
 
 # Scrape historical price and market cap data
 crypto_portfolio.get_prices_df()
@@ -105,10 +103,11 @@ n_days = 365
 mu_method = "exp"
 cov_method = "sample"
 obj_function = "quadratic"
-crypto_portfolio.validate_from_past(n_coins, n_days, mu_method, cov_method, obj_function)
+compounding = True
+crypto_portfolio.validate_from_past(n_coins, n_days, mu_method, cov_method, obj_function, compounding)
 
 # Optimize current portfolio
-crypto_portfolio.optimize_portfolio(n_coins, mu_method, cov_method, obj_function)
+crypto_portfolio.optimize_portfolio(n_coins, mu_method, cov_method, obj_function, compounding)
 ```
 
 The Cryptos class simplifies cryptocurrency data analysis and portfolio optimization, making it easier to manage your crypto investments effectively. Happy investing!
