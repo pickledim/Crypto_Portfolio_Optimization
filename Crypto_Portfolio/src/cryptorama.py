@@ -4,7 +4,6 @@ import time
 import pickle
 from datetime import timedelta
 
-
 import pandas as pd
 
 import Crypto_Portfolio.src.clean_dir as cd
@@ -222,11 +221,11 @@ class CryptoPortfolio:
 
         if not _scrap:
             self.df_prices = pd.read_csv(f"{self.save_dir}/{self.csv_name}.csv", index_col=0)
+            self.df_market_cap = pd.read_csv(f"{self.save_dir}/{self.csv_name}_market_cap.csv", index_col=0)
 
-        df_mc = pd.read_csv(f"{self.save_dir}/{self.csv_name}_market_cap.csv", index_col=0)
-        df_mc = df_mc.iloc[_n_days:, :]  # see the market cap of the coins from the specific day
+        df_mc = self.df_market_cap.iloc[_n_days:, :].copy()  # see the market cap of the coins from the specific day
         df_365 = df_mc.iloc[0, :].T  # take the market cap of only that day
-        df_365.dropna(inplace=True)  
+        df_365.dropna(inplace=True)
         coins = df_365.nlargest(_n_coins, )  # keep the n largest coins in terms of market cap
         self.selected_coins_of_past = list(coins.index)  # store the names in a list
 
@@ -236,8 +235,8 @@ class CryptoPortfolio:
         coin_list = self.df_prices.columns.tolist()
         coins = list(set(coin_list).intersection(self.selected_coins_of_past))
 
-        self.df_prices = self.df_prices[coins]
-        
+        # self.df_prices = self.df_prices[coins]
+
         # if self.hodl:
         # if you hodl check the prices of today
         #     prices_now = self.df_prices.iloc[0, :]
@@ -245,11 +244,11 @@ class CryptoPortfolio:
         #     # if you trade check the prices after one year of the investment
         #     prices_now = self.df_prices.iloc[_n_days - 365, :]
 
-        prices_now = self.df_prices.iloc[0, :]
+        prices_now = self.df_prices[coins].iloc[0]
         # take the prices up to n_day
-        self.df_prices_past = self.df_prices.iloc[_n_days:, :]
+        self.df_prices_past = self.df_prices[coins].iloc[_n_days:]
         # take the prices of the n_day
-        prices_past = self.df_prices.iloc[_n_days, :]
+        prices_past = self.df_prices[coins].iloc[_n_days]
 
         # portfolio optimization
         self.portfolio_from_past, mu, weights = algos.portfolio_optimization(self.df_prices_past, coins, self.budget,
@@ -300,11 +299,12 @@ class CryptoPortfolio:
 
         if not _scrap:
             self.df_prices = pd.read_csv(f"{self.save_dir}/{self.csv_name}.csv", index_col=0)
-
-        df_mc = pd.read_csv(f"{self.save_dir}/{self.csv_name}_market_cap.csv", index_col=0)
-        df_mc.index = pd.Series(df_mc.index).apply(lambda date_str: algos.convert_to_datetime(date_str))
-        self.df_prices.index = pd.Series(self.df_prices.index).apply(lambda date_str:
-                                                                     algos.convert_to_datetime(date_str))
+            self.df_prices.index = pd.Series(self.df_prices.index).apply(lambda date_str:
+                                                                         algos.convert_to_datetime(date_str))
+            self.df_market_cap = pd.read_csv(f"{self.save_dir}/{self.csv_name}_market_cap.csv", index_col=0)
+            self.df_market_cap.index = pd.Series(self.df_market_cap.index).apply(lambda date_str:
+                                                                                 algos.convert_to_datetime(date_str))
+        df_mc = self.df_market_cap.copy()
 
         current_date = df_mc.iloc[0].name
         buy_timestamp = current_date - timedelta(days=buy_date)
@@ -321,8 +321,8 @@ class CryptoPortfolio:
         coin_list = self.df_prices.columns.tolist()
         coins = list(set(coin_list).intersection(self.selected_coins_of_past))
 
-        self.df_prices = self.df_prices[coins]
-        self.df_prices_specific = self.df_prices.loc[buy_timestamp:, :]
+        # self.df_prices = self.df_prices[coins]
+        self.df_prices_specific = self.df_prices.loc[buy_timestamp:, coins]
         # take the prices up to n_day
         # self.df_prices_specific2 = self.df_prices.loc[sell_timestamp:, :]
 
@@ -364,14 +364,14 @@ class CryptoPortfolio:
         :type _scrap: bool
         """
 
-        df_mc = pd.read_csv(f"{self.save_dir}/{self.csv_name}_market_cap.csv", index_col=0)
         if not _scrap:
             self.df_prices = pd.read_csv(f"{self.save_dir}/{self.csv_name}.csv", index_col=0)
+            self.df_market_cap = pd.read_csv(f"{self.save_dir}/{self.csv_name}_market_cap.csv", index_col=0)
 
         self.coins = self.df_prices.columns
 
         # take the n coins of the largest market cap
-        df_365 = df_mc.iloc[0, :].T
+        df_365 = self.df_market_cap.iloc[0, :].T
         coins = df_365.nlargest(_n_coins, )
         df_365.dropna(inplace=True)
         self.selected_coins = list(coins.index)
@@ -425,7 +425,7 @@ class CryptoPortfolio:
                                 _scrap=False)
 
     def run_all(self, file, _n_coins, _n_days, sell_date, _mu_method, _cov_method, _obj_function, _compounding=False,
-                _scrap=False):
+                _scrap=True):
         """
         Run the entire pipeline for cryptocurrency data analysis and portfolio optimization.
 
@@ -440,10 +440,10 @@ class CryptoPortfolio:
         self.regex_coins(file)
         self.get_prices_df()
         self.get_market_cap_df()
-        self.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_function, _compounding=False, _scrap=False)
-        self.validate_from_past(_n_coins, _n_days, _mu_method, _cov_method, _obj_function, _compounding, _scrap=False)
+        self.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_function, _compounding=False, _scrap=True)
+        self.validate_from_past(_n_coins, _n_days, _mu_method, _cov_method, _obj_function, _compounding, _scrap=True)
         self.validate_from_past_specific_dates(_n_coins, _n_days, sell_date, _mu_method, _cov_method, _obj_function,
-                                               _compounding, _scrap=False)
+                                               _compounding, _scrap=True)
 
 
 if __name__ == "__main__":

@@ -72,8 +72,7 @@ def run_app(inputs_dict):
     return cyrptos_instance
 
 
-def calculate_profit(df, _top_100, _n_coins, _mu_method, _cov_method, _obj_function, _budget, _n_days_vector, sell_day,
-                     compounding,  _save_dir):
+def calculate_profit(inputs):
     """
     Calculate the profit and optimized portfolios for a given DataFrame and parameters.
 
@@ -81,35 +80,43 @@ def calculate_profit(df, _top_100, _n_coins, _mu_method, _cov_method, _obj_funct
     selected tokens and various input parameters for portfolio optimization.
 
     Parameters:
-        :param df: The DataFrame containing historical daily returns of selected tokens.
-        :type df: pandas.DataFrame
-        :param _top_100: Boolean flag indicating whether to consider only the top 100 tokens by market cap.
-        :type _top_100: bool
-        :param _n_coins: The number of tokens to be included in the portfolio.
-        :type _n_coins: int
-        :param _mu_method: The method to calculate the mean historical return of tokens (e.g., 'mean', 'exp', 'capm').
-        :type _mu_method: str
-        :param _cov_method: The method to calculate the covariance matrix of tokens' returns (e.g., 'sample', 'exp').
-        :type _cov_method: str
-        :param _obj_function: The objective function for portfolio optimization
-        (e.g., 'sharpe', 'quadratic', 'min_volat').
-        :type _obj_function: str
-        :param _budget: The investment budget for the portfolio.
-        :type _budget: float
-        :param _n_days_vector: A list of integers representing the number of days to validate the optimized portfolio.
-        :type _n_days_vector: List[int]
-        :param sell_day: The number of days from the latest date to consider for selling the tokens in the portfolio.
-        :type sell_day: int
-        :param compounding: Boolean flag indicating whether to consider compounding returns.
-        :type compounding: bool
-        :param _save_dir: The directory path to save the resulting data and figures.
-        :type _save_dir: str
+        :param inputs: A dictionary containing the input parameters for portfolio optimization.
+                       It should include the following keys:
+                       - 'data': The DataFrame containing historical daily returns of selected tokens.
+                       - 'top_100': Boolean flag indicating whether to consider only the top 100 tokens by market cap.
+                       - 'n_coins': The number of tokens to be included in the portfolio.
+                       - 'mu_method': The method to calculate the mean historical return of tokens
+                                      (e.g., 'mean', 'exp', 'capm').
+                       - 'cov_method': The method to calculate the covariance matrix of tokens' returns
+                                       (e.g., 'sample', 'exp').
+                       - 'obj_function': The objective function for portfolio optimization
+                                         (e.g., 'sharpe', 'quadratic', 'min_volat').
+                       - 'budget': The investment budget for the portfolio.
+                       - 'days_vector': A list of integers representing the number of days to validate the optimized
+                       portfolio.
+                       - 'sell_day': The number of days from the latest date to consider for selling the tokens in the
+                       portfolio.
+                       - 'compounding': Boolean flag indicating whether to consider compounding returns.
+                       - 'save_dir': The directory path to save the resulting data and figures.
+        :type inputs: dict
 
     Returns:
         :return: A tuple containing the total profit, a dictionary of profits on different validation days, and a
                  dictionary of optimized portfolios on different validation days.
         :rtype: Tuple[float, Dict[str, float], Dict[str, pandas.DataFrame]]
     """
+    df = inputs["data"]
+    _top_100 = inputs["top_100"]
+    _n_coins = inputs["n_coins"]
+    _mu_method = inputs["mu_method"]
+    _cov_method = inputs["cov_method"]
+    _obj_function = inputs["obj_function"]
+    _budget = inputs["budget"]
+    _n_days_vector = inputs["days_vector"]
+    sell_day = inputs["sell_day"]
+    compounding = inputs["compounding"]
+    _save_dir = inputs["save_dir"]
+
     crypto_class = CryptoPortfolio(_top_100, _budget, _n_coins, _save_dir)
     results = {}
     portf = {}
@@ -147,7 +154,7 @@ def check_coins(portfolio):
         each cryptocurrency in the given portfolio.
 
     Example:
-    >>> check_coins({
+     check_coins({
             '2019-05-11': pd.DataFrame({
                 'Coin': ['BNB'],
                 'Amount': [100.0],

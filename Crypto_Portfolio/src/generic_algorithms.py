@@ -139,9 +139,12 @@ def filter_columns_by_data_span(data, min_data_span_days=60):
         pos1 = data[token].last_valid_index()
         pos2 = data[token].first_valid_index()
         if pos1 is not None and pos2 is not None:
-            start = convert_to_datetime(pos1)
-            end = convert_to_datetime(pos2)
-            delta = end - start
+            if type(pos1) == str and type(pos2) == str:
+                start = convert_to_datetime(pos1)
+                end = convert_to_datetime(pos2)
+                delta = end - start
+            else:
+                delta = pos2 - pos1
             if delta.days < min_data_span_days:
                 columns_to_drop.append(token)
         else:
@@ -206,8 +209,19 @@ def portfolio_optimization(df, selected_coins, _budget, _mu_method, _cov_method,
     df = df[selected_coins]
 
     # TODO: check if my theory is correct (since mu is multiplied by frequency the tokens should at least be in the
-    #  market for 1 year
-    # keep the coins that are in the market for at least 1 year   #2 months
+    #  market for 1 year)
+    """
+    Each column represents the historical daily returns for a specific token.
+
+    For the formula to be valid, you need to have at least 365 non-NaN data points for each token. 
+    If any token has fewer than 365 non-NaN data points, you won't be able to accurately calculate the 
+    compounded return over 365 days for that token.
+
+    In summary, for each token column, you should have at least 365 non-NaN data points to use the formula correctly. 
+    If a token has fewer data points, you should consider using a different frequency or excluding that token from 
+    the analysis to ensure meaningful results.
+    """
+    # keep the coins that are in the market for at least 1 year
     df = filter_columns_by_data_span(df, min_data_span_days=365)
 
     # if _drop:
