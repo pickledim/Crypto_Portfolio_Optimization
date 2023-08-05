@@ -158,14 +158,14 @@ def test_specific_dates(cryptos_instance):
     cryptos_instance.validate_from_past_specific_dates(n_coins, buy_date, sell_date, mu_method, cov_method,
                                                        obj_function, compounding, _scrap=False)
 
-    assert np.all(cryptos_instance.portfolio_from_past_specific["Coin"].values == ['BTC'])
+    assert np.all(cryptos_instance.portfolio_from_past_specific["Coin"].values == ['XRP', 'BTC', 'XLM'])
     assert np.all(
-        np.isclose(cryptos_instance.portfolio_from_past_specific["Amount"].values,
-                   np.array([10e3])))
+        np.all(np.isclose(cryptos_instance.portfolio_from_past_specific["Amount"].values,
+                          np.array([5270.8, 4582.1, 147.10000000000002]))))
     assert np.all(np.isclose(cryptos_instance.portfolio_from_past_specific["n_coins"].values,
-                             np.array([0.9098457998963002])))
+                             np.array([23564.904765840012, 0.41690044397048376, 1555.944040521383])))
 
-    assert np.isclose(cryptos_instance.p_l_specific, 25854.23974078082)
+    assert np.isclose(cryptos_instance.p_l_specific, 22028.210521246423)
 
     obj_function = "quadratic"
     cryptos_instance.validate_from_past_specific_dates(n_coins, buy_date, sell_date, mu_method, cov_method,

@@ -183,7 +183,7 @@ def portfolio_optimization(df, selected_coins, _budget, _mu_method, _cov_method,
         :type _obj_function: str
 
         :param _compounding: Boolean flag indicating whether to compound the mean. Default is False.
-        :type _drop: bool
+        :type _compounding: bool
 
     Returns:
         :return: A dictionary containing the optimized portfolio with coin names as keys and
@@ -205,8 +205,10 @@ def portfolio_optimization(df, selected_coins, _budget, _mu_method, _cov_method,
 
     df = df[selected_coins]
 
-    # keep the coins that are in the market for at least 2 months
-    df = filter_columns_by_data_span(df, min_data_span_days=60)
+    # TODO: check if my theory is correct (since mu is multiplied by frequency the tokens should at least be in the
+    #  market for 1 year
+    # keep the coins that are in the market for at least 1 year   #2 months
+    df = filter_columns_by_data_span(df, min_data_span_days=365)
 
     # if _drop:
     #     df.dropna(inplace=True)

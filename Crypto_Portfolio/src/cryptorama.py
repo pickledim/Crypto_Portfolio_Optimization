@@ -322,12 +322,12 @@ class CryptoPortfolio:
         coins = list(set(coin_list).intersection(self.selected_coins_of_past))
 
         self.df_prices = self.df_prices[coins]
-
+        self.df_prices_specific = self.df_prices.loc[buy_timestamp:, :]
         # take the prices up to n_day
-        self.df_prices_specific = self.df_prices.loc[sell_timestamp:, :]
+        # self.df_prices_specific2 = self.df_prices.loc[sell_timestamp:, :]
 
-        sell_prices = self.df_prices_specific.loc[sell_timestamp, :]
-        buy_prices = self.df_prices_specific.loc[buy_timestamp, :]
+        sell_prices = self.df_prices.loc[sell_timestamp, :]
+        buy_prices = self.df_prices.loc[buy_timestamp, :]
 
         self.df_prices_specific.index = self.df_prices_specific.index.strftime("%Y-%m-%d")
 
@@ -458,7 +458,7 @@ if __name__ == "__main__":
     hodl = True
     scrap = False
     save_to = "./new_data"
-    crypto_class_20c = CryptoPortfolio(top_100, budget, n_coins, hodl, save_dir=save_to)
+    crypto_class_20c = CryptoPortfolio(top_100, budget, n_coins, save_dir=save_to)
 
     # crypto_class_20c.get_prices_df()
     # crypto_class_20c.get_market_cap_df()
