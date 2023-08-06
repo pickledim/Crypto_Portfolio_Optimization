@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto_Portfolio.src package &mdash; Crypto Portfolio Optimization  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Crypto_Portfolio package" href="Crypto_Portfolio.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Crypto Portfolio Optimization
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Cryptos_Updated</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="Crypto_Portfolio.html">Crypto_Portfolio package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="Crypto_Portfolio.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Crypto_Portfolio.src package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Crypto_Portfolio.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Crypto_Portfolio.html#module-Crypto_Portfolio.params">Crypto_Portfolio.params module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Crypto_Portfolio.html#crypto-portfolio-app-wrapper-module">Crypto_Portfolio.app_wrapper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Crypto_Portfolio.html#module-Crypto_Portfolio">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Crypto Portfolio Optimization</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Cryptos_Updated</a></li>
+          <li class="breadcrumb-item"><a href="Crypto_Portfolio.html">Crypto_Portfolio package</a></li>
+      <li class="breadcrumb-item active">Crypto_Portfolio.src package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Crypto_Portfolio.src.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="crypto-portfolio-src-package">
+<h1>Crypto_Portfolio.src package<a class="headerlink" href="#crypto-portfolio-src-package" title="Permalink to this headline"></a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</div>
+<div class="section" id="module-Crypto_Portfolio.src.cryptorama">
+<span id="crypto-portfolio-src-cryptorama-module"></span><h2>Crypto_Portfolio.src.cryptorama module<a class="headerlink" href="#module-Crypto_Portfolio.src.cryptorama" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt id="Crypto_Portfolio.src.cryptorama.CryptoPortfolio">
+<em class="property">class </em><code class="sig-prename descclassname">Crypto_Portfolio.src.cryptorama.</code><code class="sig-name descname">CryptoPortfolio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">top_hundred</span></em>, <em class="sig-param"><span class="n">_budget</span></em>, <em class="sig-param"><span class="n">_n_coins</span></em>, <em class="sig-param"><span class="n">save_dir</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/cryptorama.html#CryptoPortfolio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.cryptorama.CryptoPortfolio" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for performing cryptocurrency data analysis and portfolio optimization.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">attr top_hundred</dt>
+<dd class="field-odd"><p>Flag to choose between top 100 and top 1000 coins.</p>
+</dd>
+<dt class="field-even">type top_hundred</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+<dt class="field-odd">attr _budget</dt>
+<dd class="field-odd"><p>The total budget for the portfolio.</p>
+</dd>
+<dt class="field-even">type _budget</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+<dt class="field-odd">attr _n_coins</dt>
+<dd class="field-odd"><p>The number of coins to consider for portfolio optimization.</p>
+</dd>
+<dt class="field-even">type _n_coins</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">attr coins</dt>
+<dd class="field-odd"><p>List of cryptocurrency coins.</p>
+</dd>
+<dt class="field-even">type coins</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">attr csv_name</dt>
+<dd class="field-odd"><p>Name of the CSV file to save the scraped data.</p>
+</dd>
+<dt class="field-even">type csv_name</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">attr budget</dt>
+<dd class="field-odd"><p>The total budget for the portfolio.</p>
+</dd>
+<dt class="field-even">type budget</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+<dt class="field-odd">attr p_l</dt>
+<dd class="field-odd"><p>Profit-loss of the selected coins.</p>
+</dd>
+<dt class="field-even">type p_l</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">attr selected_coins_of_past</dt>
+<dd class="field-odd"><p>List of selected coins for the past portfolio.</p>
+</dd>
+<dt class="field-even">type selected_coins_of_past</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">attr selected_coins</dt>
+<dd class="field-odd"><p>List of selected coins for the current portfolio.</p>
+</dd>
+<dt class="field-even">type selected_coins</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">attr market_cap</dt>
+<dd class="field-odd"><p>List containing historic market cap data for each coin.</p>
+</dd>
+<dt class="field-even">type market_cap</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">attr date</dt>
+<dd class="field-odd"><p>DataFrame containing date information for price data.</p>
+</dd>
+<dt class="field-even">type date</dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+<dt class="field-odd">attr df_prices</dt>
+<dd class="field-odd"><p>DataFrame containing historical price data of selected coins.</p>
+</dd>
+<dt class="field-even">type df_prices</dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+<dt class="field-odd">attr df_market_cap</dt>
+<dd class="field-odd"><p>DataFrame containing historical market cap data of selected coins.</p>
+</dd>
+<dt class="field-even">type df_market_cap</dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+<dt class="field-odd">attr df_prices_past</dt>
+<dd class="field-odd"><p>DataFrame containing historical price data up to a specific number of days.</p>
+</dd>
+<dt class="field-even">type df_prices_past</dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+<dt class="field-odd">attr portfolio_from_past</dt>
+<dd class="field-odd"><p>DataFrame representing the optimized portfolio for the past.</p>
+</dd>
+<dt class="field-even">type portfolio_from_past</dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+<dt class="field-odd">attr portfolio</dt>
+<dd class="field-odd"><p>DataFrame representing the current optimized portfolio.</p>
+</dd>
+<dt class="field-even">type portfolio</dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd>
+<dt>Methods:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">meth __init__</dt>
+<dd class="field-odd"><p>Initialize the CryptoPortfolio with provided parameters.</p>
+</dd>
+<dt class="field-even">meth regex_coins</dt>
+<dd class="field-even"><p>Extract cryptocurrency coins from a text file using regex.</p>
+</dd>
+<dt class="field-odd">meth get_prices_df</dt>
+<dd class="field-odd"><p>Get a DataFrame containing historical price data of selected coins.</p>
+</dd>
+<dt class="field-even">meth get_market_cap_df</dt>
+<dd class="field-even"><p>Get a DataFrame containing historical market cap data of selected coins.</p>
+</dd>
+<dt class="field-odd">meth validate_from_past</dt>
+<dd class="field-odd"><p>Validate the portfolio from the past.</p>
+</dd>
+<dt class="field-even">meth validate_from_past_specific_dates</dt>
+<dd class="field-even"><p>Validate the portfolio from past specific dates.</p>
+</dd>
+<dt class="field-odd">meth optimize_portfolio</dt>
+<dd class="field-odd"><p>Optimize the portfolio for a given set of inputs.</p>
+</dd>
+<dt class="field-even">meth data_pipeline</dt>
+<dd class="field-even"><p>Execute the data processing pipeline.</p>
+</dd>
+<dt class="field-odd">meth post_pros_pipeline</dt>
+<dd class="field-odd"><p>Execute the post-processing pipeline.</p>
+</dd>
+<dt class="field-even">meth run_all</dt>
+<dd class="field-even"><p>Run all the steps of the portfolio optimization process.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Crypto_Portfolio.src.cryptorama.CryptoPortfolio.data_pipeline">
+<code class="sig-name descname">data_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/cryptorama.html#CryptoPortfolio.data_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.data_pipeline" title="Permalink to this definition"></a></dt>
+<dd><p>Run the data pipeline to scrape cryptocurrency price data and market cap data.</p>
+<p>This method calls the ‘get_prices_df()’ and ‘get_market_cap_df()’ methods to scrape the historical price
+data and market cap data of selected coins and saves the data to CSV files for future use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Crypto_Portfolio.src.cryptorama.CryptoPortfolio.get_market_cap_df">
+<code class="sig-name descname">get_market_cap_df</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/cryptorama.html#CryptoPortfolio.get_market_cap_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.get_market_cap_df" title="Permalink to this definition"></a></dt>
+<dd><p>Creates the DataFrame of all the coins” market cap.</p>
+<p>This function will save the market cap DataFrame to a CSV file for future use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Crypto_Portfolio.src.cryptorama.CryptoPortfolio.get_prices_df">
+<code class="sig-name descname">get_prices_df</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/cryptorama.html#CryptoPortfolio.get_prices_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.get_prices_df" title="Permalink to this definition"></a></dt>
+<dd><p>Scrapes the historical price data of selected coins and creates a DataFrame.</p>
+<p>This function will save the prices DataFrame to a CSV file for future use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Crypto_Portfolio.src.cryptorama.CryptoPortfolio.optimize_portfolio">
+<code class="sig-name descname">optimize_portfolio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_n_coins</span></em>, <em class="sig-param"><span class="n">_mu_method</span></em>, <em class="sig-param"><span class="n">_cov_method</span></em>, <em class="sig-param"><span class="n">_obj_function</span></em>, <em class="sig-param"><span class="n">_compounding</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">_scrap</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/cryptorama.html#CryptoPortfolio.optimize_portfolio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.optimize_portfolio" title="Permalink to this definition"></a></dt>
+<dd><p>Performs portfolio optimization and creates the optimized portfolio DataFrame.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param _n_coins</dt>
+<dd class="field-odd"><p>Number of coins to consider for portfolio optimization.</p>
+</dd>
+<dt class="field-even">type _n_coins</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">param _mu_method</dt>
+<dd class="field-odd"><p>Method for calculating expected returns. Possible values: “mean”, “exp”, “capm”.</p>
+</dd>
+<dt class="field-even">type _mu_method</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _cov_method</dt>
+<dd class="field-odd"><p>Method for calculating covariance. Possible values: “sample”, “exp”.</p>
+</dd>
+<dt class="field-even">type _cov_method</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _obj_function</dt>
+<dd class="field-odd"><p>Objective function for optimization. Possible values: “quadratic”, “sharpe”, “min_volat”.</p>
+</dd>
+<dt class="field-even">type _obj_function</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _compounding</dt>
+<dd class="field-odd"><p>Boolean flag indicating whether to compound on mu. Default is False.</p>
+</dd>
+<dt class="field-even">type _compounding</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+<dt class="field-odd">param _scrap</dt>
+<dd class="field-odd"><p>Boolean flag indicating whether to re-scrap data or use existing data.</p>
+</dd>
+<dt class="field-even">type _scrap</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Crypto_Portfolio.src.cryptorama.CryptoPortfolio.post_pros_pipeline">
+<code class="sig-name descname">post_pros_pipeline</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_n_coins</span></em>, <em class="sig-param"><span class="n">_n_days</span></em>, <em class="sig-param"><span class="n">_mu_method</span></em>, <em class="sig-param"><span class="n">_cov_method</span></em>, <em class="sig-param"><span class="n">_obj_function</span></em>, <em class="sig-param"><span class="n">_compounding</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">_scrap</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/cryptorama.html#CryptoPortfolio.post_pros_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.post_pros_pipeline" title="Permalink to this definition"></a></dt>
+<dd><p>Run the post-processing pipeline to perform portfolio optimization and validation.</p>
+<p>This method calls the ‘validate_from_past()’ and ‘optimize_portfolio()’ methods to perform portfolio
+optimization based on past data and create the optimized portfolio DataFrame.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Crypto_Portfolio.src.cryptorama.CryptoPortfolio.regex_coins">
+<code class="sig-name descname">regex_coins</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/cryptorama.html#CryptoPortfolio.regex_coins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.regex_coins" title="Permalink to this definition"></a></dt>
+<dd><p>Extracts crypto coins from a file using regex.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param file</dt>
+<dd class="field-odd"><p>The name of the file to extract coins from.</p>
+</dd>
+<dt class="field-even">type file</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Crypto_Portfolio.src.cryptorama.CryptoPortfolio.run_all">
+<code class="sig-name descname">run_all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">_n_coins</span></em>, <em class="sig-param"><span class="n">_n_days</span></em>, <em class="sig-param"><span class="n">sell_date</span></em>, <em class="sig-param"><span class="n">_mu_method</span></em>, <em class="sig-param"><span class="n">_cov_method</span></em>, <em class="sig-param"><span class="n">_obj_function</span></em>, <em class="sig-param"><span class="n">_compounding</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">_scrap</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/cryptorama.html#CryptoPortfolio.run_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.run_all" title="Permalink to this definition"></a></dt>
+<dd><p>Run the entire pipeline for cryptocurrency data analysis and portfolio optimization.</p>
+<dl class="simple">
+<dt>This method calls the following methods in sequence:</dt><dd><ol class="arabic simple">
+<li><p>‘regex_coins()’: Extracts crypto coins from a file using regex.</p></li>
+<li><p>‘get_prices()’: Scrapes the historical price data of selected coins and creates a DataFrame.</p></li>
+<li><p>‘get_market_cap_df()’: Creates the DataFrame of all the coins’ market cap.</p></li>
+<li><p>‘validate_from_past()’: Performs portfolio optimization based on past data and validates the results.</p></li>
+<li><p>‘optimize_portfolio()’: Performs portfolio optimization and creates the optimized portfolio DataFrame.</p></li>
+</ol>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Crypto_Portfolio.src.cryptorama.CryptoPortfolio.validate_from_past">
+<code class="sig-name descname">validate_from_past</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_n_coins</span></em>, <em class="sig-param"><span class="n">_n_days</span></em>, <em class="sig-param"><span class="n">_mu_method</span></em>, <em class="sig-param"><span class="n">_cov_method</span></em>, <em class="sig-param"><span class="n">_obj_function</span></em>, <em class="sig-param"><span class="n">_compounding</span></em>, <em class="sig-param"><span class="n">_scrap</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/cryptorama.html#CryptoPortfolio.validate_from_past"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.validate_from_past" title="Permalink to this definition"></a></dt>
+<dd><p>Performs portfolio optimization based on past data and validates the results.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param _n_coins</dt>
+<dd class="field-odd"><p>Number of coins to consider for portfolio optimization.</p>
+</dd>
+<dt class="field-even">type _n_coins</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">param _n_days</dt>
+<dd class="field-odd"><p>Number of days to consider for past data.</p>
+</dd>
+<dt class="field-even">type _n_days</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">param _mu_method</dt>
+<dd class="field-odd"><p>Method for calculating expected returns. Possible values: “mean”, “exp”, “capm”.</p>
+</dd>
+<dt class="field-even">type _mu_method</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _cov_method</dt>
+<dd class="field-odd"><p>Method for calculating covariance. Possible values: “sample”, “exp”.</p>
+</dd>
+<dt class="field-even">type _cov_method</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _obj_function</dt>
+<dd class="field-odd"><p>Objective function for optimization.
+Possible values: “quadratic”, “sharpe”, “min_volat”.</p>
+</dd>
+<dt class="field-even">type _obj_function</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _compounding</dt>
+<dd class="field-odd"><p>Boolean flag indicating whether to drop missing values from the DataFrame.
+Default is False.</p>
+</dd>
+<dt class="field-even">type _compounding</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+<dt class="field-odd">param _scrap</dt>
+<dd class="field-odd"><p>Boolean flag indicating whether to re-scrap data or use existing data.</p>
+</dd>
+<dt class="field-even">type _scrap</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Crypto_Portfolio.src.cryptorama.CryptoPortfolio.validate_from_past_specific_dates">
+<code class="sig-name descname">validate_from_past_specific_dates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_n_coins</span></em>, <em class="sig-param"><span class="n">buy_date</span></em>, <em class="sig-param"><span class="n">sell_date</span></em>, <em class="sig-param"><span class="n">_mu_method</span></em>, <em class="sig-param"><span class="n">_cov_method</span></em>, <em class="sig-param"><span class="n">_obj_function</span></em>, <em class="sig-param"><span class="n">_compounding</span></em>, <em class="sig-param"><span class="n">_scrap</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/cryptorama.html#CryptoPortfolio.validate_from_past_specific_dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.validate_from_past_specific_dates" title="Permalink to this definition"></a></dt>
+<dd><p>Perform portfolio optimization based on historical data within specific buy and sell dates.</p>
+<p>This method optimizes the cryptocurrency portfolio based on historical price data of selected coins,
+considering a specific buy date and sell date. It calculates the optimized portfolio, expected returns,
+and weights of each asset.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param _n_coins</dt>
+<dd class="field-odd"><p>Number of coins to consider for portfolio optimization.</p>
+</dd>
+<dt class="field-even">type _n_coins</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">param buy_date</dt>
+<dd class="field-odd"><p>Number of days from the current date to the buy date for the historical data.</p>
+</dd>
+<dt class="field-even">type buy_date</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">param sell_date</dt>
+<dd class="field-odd"><p>Number of days from the current date to the sell date for the historical data.</p>
+</dd>
+<dt class="field-even">type sell_date</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">param _mu_method</dt>
+<dd class="field-odd"><p>Method for calculating expected returns. Possible values: “mean”, “exp”, “capm”.</p>
+</dd>
+<dt class="field-even">type _mu_method</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _cov_method</dt>
+<dd class="field-odd"><p>Method for calculating covariance. Possible values: “sample”, “exp”.</p>
+</dd>
+<dt class="field-even">type _cov_method</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _obj_function</dt>
+<dd class="field-odd"><p>Objective function for optimization.
+Possible values: “quadratic”, “sharpe”, “min_volat”</p>
+</dd>
+<dt class="field-even">type _obj_function</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _compounding</dt>
+<dd class="field-odd"><p>Boolean flag indicating whether to apply compounding to returns over time.</p>
+</dd>
+<dt class="field-even">type _compounding</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+<dt class="field-odd">param _scrap</dt>
+<dd class="field-odd"><p>Boolean flag indicating whether to re-scrape data or use existing data.</p>
+</dd>
+<dt class="field-even">type _scrap</dt>
+<dd class="field-even"><p>bool, optional</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">return</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="Crypto_Portfolio.src.cryptorama.remove_unwanted_coins">
+<code class="sig-prename descclassname">Crypto_Portfolio.src.cryptorama.</code><code class="sig-name descname">remove_unwanted_coins</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coins_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/cryptorama.html#remove_unwanted_coins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.cryptorama.remove_unwanted_coins" title="Permalink to this definition"></a></dt>
+<dd><p>Remove unwanted coins from the list of coins.
+This function removes stablecoins, shitty coins, and coins that cannot be bought.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param coins_list</dt>
+<dd class="field-odd"><p>List of coins to filter.</p>
+</dd>
+<dt class="field-even">type coins_list</dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+<dt class="field-odd">return</dt>
+<dd class="field-odd"><p>List of coins after filtering.</p>
+</dd>
+<dt class="field-even">rtype</dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-Crypto_Portfolio.src.generic_algorithms">
+<span id="crypto-portfolio-src-generic-algorithms-module"></span><h2>Crypto_Portfolio.src.generic_algorithms module<a class="headerlink" href="#module-Crypto_Portfolio.src.generic_algorithms" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt id="Crypto_Portfolio.src.generic_algorithms.convert_to_datetime">
+<code class="sig-prename descclassname">Crypto_Portfolio.src.generic_algorithms.</code><code class="sig-name descname">convert_to_datetime</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/generic_algorithms.html#convert_to_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.generic_algorithms.convert_to_datetime" title="Permalink to this definition"></a></dt>
+<dd><p>Converts a date string to a datetime object.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param date_str</dt>
+<dd class="field-odd"><p>The input date string in the format “%Y-%m-%d”.</p>
+</dd>
+<dt class="field-even">type date_str</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">return</dt>
+<dd class="field-odd"><p>A datetime object representing the input date.</p>
+</dd>
+<dt class="field-even">rtype</dt>
+<dd class="field-even"><p>datetime.datetime</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Crypto_Portfolio.src.generic_algorithms.filter_columns_by_data_span">
+<code class="sig-prename descclassname">Crypto_Portfolio.src.generic_algorithms.</code><code class="sig-name descname">filter_columns_by_data_span</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">min_data_span_days</span><span class="o">=</span><span class="default_value">60</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/generic_algorithms.html#filter_columns_by_data_span"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.generic_algorithms.filter_columns_by_data_span" title="Permalink to this definition"></a></dt>
+<dd><p>Filters columns in a DataFrame based on the time span of available data.</p>
+<p>The function iterates through each column in the DataFrame and checks the time span
+between the first and last valid index of each column. If the time span is less than
+the specified minimum data span (in days), the column is marked for removal. After
+processing all columns, the marked columns are dropped from the DataFrame.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param data</dt>
+<dd class="field-odd"><p>The DataFrame containing the data to be filtered.</p>
+</dd>
+<dt class="field-even">type data</dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+<dt class="field-odd">param min_data_span_days</dt>
+<dd class="field-odd"><p>The minimum data span in days to retain a column. Default is 60.</p>
+</dd>
+<dt class="field-even">type min_data_span_days</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">return</dt>
+<dd class="field-odd"><p>The DataFrame with columns filtered based on data span.</p>
+</dd>
+<dt class="field-even">rtype</dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Crypto_Portfolio.src.generic_algorithms.get_p_l">
+<code class="sig-prename descclassname">Crypto_Portfolio.src.generic_algorithms.</code><code class="sig-name descname">get_p_l</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">portfolio</span></em>, <em class="sig-param"><span class="n">in_price_coins</span></em>, <em class="sig-param"><span class="n">final_price_coins</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/generic_algorithms.html#get_p_l"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.generic_algorithms.get_p_l" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the profit-loss of the selected coins in the portfolio.</p>
+<p>The function takes an optimized portfolio dictionary, initial prices of the coins series,
+and final prices of the coins series as inputs.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param portfolio</dt>
+<dd class="field-odd"><p>The optimized portfolio dictionary with coin names as keys and investment values as values.</p>
+</dd>
+<dt class="field-even">type portfolio</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">param in_price_coins</dt>
+<dd class="field-odd"><p>A Series containing the initial prices of the coins series, with coin names as keys
+and prices as values.</p>
+</dd>
+<dt class="field-even">type in_price_coins</dt>
+<dd class="field-even"><p>pd.Series</p>
+</dd>
+<dt class="field-odd">param final_price_coins</dt>
+<dd class="field-odd"><p>A Series containing the final prices of the coins series, with coin names as keys
+and prices as values.</p>
+</dd>
+<dt class="field-even">type final_price_coins</dt>
+<dd class="field-even"><p>pd.Series</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">return</dt>
+<dd class="field-odd"><p>A DataFrame representing the portfolio with columns “Coin”, “Amount”, and “n_coins”,
+and the calculated profit-loss (p_l) for the selected coins.</p>
+</dd>
+<dt class="field-even">rtype</dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Crypto_Portfolio.src.generic_algorithms.portfolio_optimization">
+<code class="sig-prename descclassname">Crypto_Portfolio.src.generic_algorithms.</code><code class="sig-name descname">portfolio_optimization</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">selected_coins</span></em>, <em class="sig-param"><span class="n">_budget</span></em>, <em class="sig-param"><span class="n">_mu_method</span></em>, <em class="sig-param"><span class="n">_cov_method</span></em>, <em class="sig-param"><span class="n">_obj_function</span></em>, <em class="sig-param"><span class="n">_compounding</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/generic_algorithms.html#portfolio_optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.generic_algorithms.portfolio_optimization" title="Permalink to this definition"></a></dt>
+<dd><p>Perform portfolio optimization using the Efficient Frontier approach.</p>
+<p>The function takes historical price data (DataFrame) of selected coins, budget,
+method for calculating expected returns, method for calculating covariance, objective
+function for optimization, and a boolean flag for dropping missing values.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param df</dt>
+<dd class="field-odd"><p>DataFrame containing historical price data of selected coins.</p>
+</dd>
+<dt class="field-even">type df</dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+<dt class="field-odd">param selected_coins</dt>
+<dd class="field-odd"><p>List of selected coin names or symbols from the DataFrame.</p>
+</dd>
+<dt class="field-even">type selected_coins</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">param _budget</dt>
+<dd class="field-odd"><p>The total budget for the portfolio.</p>
+</dd>
+<dt class="field-even">type _budget</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+<dt class="field-odd">param _mu_method</dt>
+<dd class="field-odd"><p>Method for calculating expected returns.
+Possible values: “mean”, “exp”, “capm”.</p>
+</dd>
+<dt class="field-even">type _mu_method</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _cov_method</dt>
+<dd class="field-odd"><p>Method for calculating covariance.
+Possible values: “sample”, “exp”.</p>
+</dd>
+<dt class="field-even">type _cov_method</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _obj_function</dt>
+<dd class="field-odd"><p>Objective function for optimization.
+Possible values: “quadratic”, “sharpe”, “min_volat”.</p>
+</dd>
+<dt class="field-even">type _obj_function</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param _compounding</dt>
+<dd class="field-odd"><p>Boolean flag indicating whether to compound the mean. Default is False.</p>
+</dd>
+<dt class="field-even">type _compounding</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">return</dt>
+<dd class="field-odd"><p>A dictionary containing the optimized portfolio with coin names as keys and
+investment values as values, a pandas Series representing the calculated expected returns
+for the selected coins, a dictionary with cleaned and adjusted weights for the optimized portfolio.</p>
+</dd>
+<dt class="field-even">rtype</dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Crypto_Portfolio.src.generic_algorithms.regularize">
+<code class="sig-prename descclassname">Crypto_Portfolio.src.generic_algorithms.</code><code class="sig-name descname">regularize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">weights</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/generic_algorithms.html#regularize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.generic_algorithms.regularize" title="Permalink to this definition"></a></dt>
+<dd><p>Regularizes the weights of a portfolio.</p>
+<p>The function takes a dictionary of weights as input, where the keys represent coin names or symbols,
+and the values represent the corresponding percentage weights. The function scales the weights to ensure
+that their sum equals 1, making it a valid weight distribution for a portfolio.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param weights</dt>
+<dd class="field-odd"><p>A dictionary containing coin names or symbols as keys and their corresponding percentage
+weights as values.</p>
+</dd>
+<dt class="field-even">type weights</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">return</dt>
+<dd class="field-odd"><p>The updated weights dictionary with regularized values, where the sum of all weights equals 1.</p>
+</dd>
+<dt class="field-even">rtype</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Crypto_Portfolio.src.generic_algorithms.remove_coins">
+<code class="sig-prename descclassname">Crypto_Portfolio.src.generic_algorithms.</code><code class="sig-name descname">remove_coins</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">to_remove</span></em>, <em class="sig-param"><span class="n">selected_coins</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/generic_algorithms.html#remove_coins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.generic_algorithms.remove_coins" title="Permalink to this definition"></a></dt>
+<dd><p>Removes specified coins from the selected coins list.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param to_remove</dt>
+<dd class="field-odd"><p>A list of coins to be removed from the selected coins list.</p>
+</dd>
+<dt class="field-even">type to_remove</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">param selected_coins</dt>
+<dd class="field-odd"><p>The list of selected coins.</p>
+</dd>
+<dt class="field-even">type selected_coins</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">return</dt>
+<dd class="field-odd"><p>The updated list of selected coins after removal.</p>
+</dd>
+<dt class="field-even">rtype</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Crypto_Portfolio.src.generic_algorithms.scrap_coin">
+<code class="sig-prename descclassname">Crypto_Portfolio.src.generic_algorithms.</code><code class="sig-name descname">scrap_coin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coin</span></em>, <em class="sig-param"><span class="n">coin_csv_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Crypto_Portfolio/src/generic_algorithms.html#scrap_coin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Crypto_Portfolio.src.generic_algorithms.scrap_coin" title="Permalink to this definition"></a></dt>
+<dd><p>Scrapes data for a specific coin from a data source (Coingecko or similar).</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param coin</dt>
+<dd class="field-odd"><p>The name or symbol of the coin to scrape data for.</p>
+</dd>
+<dt class="field-even">type coin</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param coin_csv_name</dt>
+<dd class="field-odd"><p>The name of the CSV file to export the scraped data.</p>
+</dd>
+<dt class="field-even">type coin_csv_name</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">return</dt>
+<dd class="field-odd"><p>A pandas DataFrame containing the scraped data for the specified coin.</p>
+</dd>
+<dt class="field-even">rtype</dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-Crypto_Portfolio.src">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-Crypto_Portfolio.src" title="Permalink to this headline"></a></h2>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Crypto_Portfolio.html" class="btn btn-neutral float-left" title="Crypto_Portfolio package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, pickledim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

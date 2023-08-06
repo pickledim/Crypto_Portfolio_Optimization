@@ -174,15 +174,15 @@ def portfolio_optimization(df, selected_coins, _budget, _mu_method, _cov_method,
         :type _budget: float
 
         :param _mu_method: Method for calculating expected returns.
-        Possible values: "mean", "exp", "capm".
+                           Possible values: "mean", "exp", "capm".
         :type _mu_method: str
 
         :param _cov_method: Method for calculating covariance.
-        Possible values: "sample", "exp".
+                            Possible values: "sample", "exp".
         :type _cov_method: str
 
         :param _obj_function: Objective function for optimization.
-        Possible values: "quadratic", "sharpe", "min_volat".
+                              Possible values: "quadratic", "sharpe", "min_volat".
         :type _obj_function: str
 
         :param _compounding: Boolean flag indicating whether to compound the mean. Default is False.
@@ -190,8 +190,8 @@ def portfolio_optimization(df, selected_coins, _budget, _mu_method, _cov_method,
 
     Returns:
         :return: A dictionary containing the optimized portfolio with coin names as keys and
-        investment values as values, a pandas Series representing the calculated expected returns
-        for the selected coins, a dictionary with cleaned and adjusted weights for the optimized portfolio.
+                 investment values as values, a pandas Series representing the calculated expected returns
+                 for the selected coins, a dictionary with cleaned and adjusted weights for the optimized portfolio.
         :rtype: tuple
     """
 
@@ -229,7 +229,7 @@ def portfolio_optimization(df, selected_coins, _budget, _mu_method, _cov_method,
 
     df = df.sort_index(ascending=True)
 
-    # Calculate expected returns and sample covariance
+    # Calculate expected returns and covariance
     mu = mu_mapping[_mu_method](df, compounding=_compounding, frequency=365)
     mu.replace([np.inf, -np.inf], np.nan, inplace=True)
     mu.dropna(inplace=True)
@@ -275,11 +275,11 @@ def get_p_l(portfolio, in_price_coins, final_price_coins):
         :type portfolio: dict
 
         :param in_price_coins: A Series containing the initial prices of the coins series, with coin names as keys
-        and prices as values.
+                               and prices as values.
         :type in_price_coins: pd.Series
 
         :param final_price_coins: A Series containing the final prices of the coins series, with coin names as keys
-        and prices as values.
+                                  and prices as values.
         :type final_price_coins: pd.Series
 
     Returns:

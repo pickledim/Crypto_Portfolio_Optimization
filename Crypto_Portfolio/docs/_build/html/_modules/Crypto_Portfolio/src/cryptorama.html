@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto_Portfolio.src.cryptorama &mdash; Crypto Portfolio Optimization  documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Crypto Portfolio Optimization
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Cryptos_Updated</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Crypto Portfolio Optimization</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Crypto_Portfolio.src.cryptorama</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Crypto_Portfolio.src.cryptorama</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">Crypto_Portfolio.src.clean_dir</span> <span class="k">as</span> <span class="nn">cd</span>
+<span class="kn">import</span> <span class="nn">Crypto_Portfolio.src.generic_algorithms</span> <span class="k">as</span> <span class="nn">algos</span>
+
+<span class="kn">from</span> <span class="nn">Crypto_Portfolio.params</span> <span class="kn">import</span> <span class="n">BASE_DIR</span>
+
+<span class="n">base_dir</span> <span class="o">=</span> <span class="n">BASE_DIR</span>
+
+
+<div class="viewcode-block" id="remove_unwanted_coins"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.cryptorama.remove_unwanted_coins">[docs]</a><span class="k">def</span> <span class="nf">remove_unwanted_coins</span><span class="p">(</span><span class="n">coins_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove unwanted coins from the list of coins.</span>
+<span class="sd">    This function removes stablecoins, shitty coins, and coins that cannot be bought.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        :param coins_list: List of coins to filter.</span>
+<span class="sd">        :type coins_list: list[str]</span>
+<span class="sd">        :return: List of coins after filtering.</span>
+<span class="sd">        :rtype: list[str]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">stablecoins</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;USDT&quot;</span><span class="p">,</span> <span class="s2">&quot;USDC&quot;</span><span class="p">,</span> <span class="s2">&quot;CUSDC&quot;</span><span class="p">,</span> <span class="s2">&quot;BUSD&quot;</span><span class="p">,</span> <span class="s2">&quot;UST&quot;</span><span class="p">,</span> <span class="s2">&quot;PAX&quot;</span><span class="p">,</span> <span class="s2">&quot;DAI&quot;</span><span class="p">,</span> <span class="s2">&quot;CDAI&quot;</span><span class="p">,</span> <span class="s2">&quot;HUSD&quot;</span><span class="p">,</span> <span class="s2">&quot;TUSD&quot;</span><span class="p">,</span> <span class="s2">&quot;USDN&quot;</span><span class="p">,</span> <span class="s2">&quot;CUSDT&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;USDP&quot;</span><span class="p">]</span>
+    <span class="n">shitty_coins</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SHIB&quot;</span><span class="p">,</span> <span class="s2">&quot;DOGE&quot;</span><span class="p">,</span> <span class="s2">&quot;XDC&quot;</span><span class="p">,</span> <span class="s2">&quot;LEO&quot;</span><span class="p">]</span>
+
+    <span class="n">coins_list</span> <span class="o">=</span> <span class="n">algos</span><span class="o">.</span><span class="n">remove_coins</span><span class="p">(</span><span class="n">stablecoins</span><span class="p">,</span> <span class="n">coins_list</span><span class="p">)</span>
+    <span class="n">coins_list</span> <span class="o">=</span> <span class="n">algos</span><span class="o">.</span><span class="n">remove_coins</span><span class="p">(</span><span class="n">shitty_coins</span><span class="p">,</span> <span class="n">coins_list</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">coins_list</span></div>
+
+
+<div class="viewcode-block" id="CryptoPortfolio"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.cryptorama.CryptoPortfolio">[docs]</a><span class="k">class</span> <span class="nc">CryptoPortfolio</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for performing cryptocurrency data analysis and portfolio optimization.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        :attr top_hundred: Flag to choose between top 100 and top 1000 coins.</span>
+<span class="sd">        :type top_hundred: bool</span>
+<span class="sd">        :attr _budget: The total budget for the portfolio.</span>
+<span class="sd">        :type _budget: float</span>
+<span class="sd">        :attr _n_coins: The number of coins to consider for portfolio optimization.</span>
+<span class="sd">        :type _n_coins: int</span>
+<span class="sd">        :attr coins: List of cryptocurrency coins.</span>
+<span class="sd">        :type coins: list</span>
+<span class="sd">        :attr csv_name: Name of the CSV file to save the scraped data.</span>
+<span class="sd">        :type csv_name: str</span>
+<span class="sd">        :attr budget: The total budget for the portfolio.</span>
+<span class="sd">        :type budget: float</span>
+<span class="sd">        :attr p_l: Profit-loss of the selected coins.</span>
+<span class="sd">        :type p_l: int</span>
+<span class="sd">        :attr selected_coins_of_past: List of selected coins for the past portfolio.</span>
+<span class="sd">        :type selected_coins_of_past: list</span>
+<span class="sd">        :attr selected_coins: List of selected coins for the current portfolio.</span>
+<span class="sd">        :type selected_coins: list</span>
+<span class="sd">        :attr market_cap: List containing historic market cap data for each coin.</span>
+<span class="sd">        :type market_cap: list</span>
+<span class="sd">        :attr date: DataFrame containing date information for price data.</span>
+<span class="sd">        :type date: pandas.DataFrame</span>
+<span class="sd">        :attr df_prices: DataFrame containing historical price data of selected coins.</span>
+<span class="sd">        :type df_prices: pandas.DataFrame</span>
+<span class="sd">        :attr df_market_cap: DataFrame containing historical market cap data of selected coins.</span>
+<span class="sd">        :type df_market_cap: pandas.DataFrame</span>
+<span class="sd">        :attr df_prices_past: DataFrame containing historical price data up to a specific number of days.</span>
+<span class="sd">        :type df_prices_past: pandas.DataFrame</span>
+<span class="sd">        :attr portfolio_from_past: DataFrame representing the optimized portfolio for the past.</span>
+<span class="sd">        :type portfolio_from_past: pandas.DataFrame</span>
+<span class="sd">        :attr portfolio: DataFrame representing the current optimized portfolio.</span>
+<span class="sd">        :type portfolio: pandas.DataFrame</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">        :meth __init__: Initialize the CryptoPortfolio with provided parameters.</span>
+<span class="sd">        :meth regex_coins: Extract cryptocurrency coins from a text file using regex.</span>
+<span class="sd">        :meth get_prices_df: Get a DataFrame containing historical price data of selected coins.</span>
+<span class="sd">        :meth get_market_cap_df: Get a DataFrame containing historical market cap data of selected coins.</span>
+<span class="sd">        :meth validate_from_past: Validate the portfolio from the past.</span>
+<span class="sd">        :meth validate_from_past_specific_dates: Validate the portfolio from past specific dates.</span>
+<span class="sd">        :meth optimize_portfolio: Optimize the portfolio for a given set of inputs.</span>
+<span class="sd">        :meth data_pipeline: Execute the data processing pipeline.</span>
+<span class="sd">        :meth post_pros_pipeline: Execute the post-processing pipeline.</span>
+<span class="sd">        :meth run_all: Run all the steps of the portfolio optimization process.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top_hundred</span><span class="p">,</span> <span class="n">_budget</span><span class="p">,</span> <span class="n">_n_coins</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the Cryptos portfolio management object.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            :param top_hundred: Flag to choose between the top 100 coins or all crypto coins.</span>
+<span class="sd">            :type top_hundred: bool</span>
+
+<span class="sd">            :param _budget: The total budget for the portfolio.</span>
+<span class="sd">            :type _budget: float</span>
+
+<span class="sd">            :param _n_coins: Number of coins to consider for portfolio optimization.</span>
+<span class="sd">            :type _n_coins: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">top_hundred</span><span class="p">:</span>
+            <span class="c1"># load the top100 coins</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_dir</span><span class="si">}</span><span class="s2">/new_data/top_100.pickle&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> \
+                    <span class="k">as</span> <span class="n">input_file</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">input_file</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">csv_name</span> <span class="o">=</span> <span class="s2">&quot;Top_100_cryptos&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># load all the crypto coins</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_dir</span><span class="si">}</span><span class="s2">/legacy_data/top_1000.pickle&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> \
+                    <span class="k">as</span> <span class="n">input_file</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">input_file</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">csv_name</span> <span class="o">=</span> <span class="s2">&quot;All_cryptos&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">budget</span> <span class="o">=</span> <span class="n">_budget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_coins</span> <span class="o">=</span> <span class="n">_n_coins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_hundred</span> <span class="o">=</span> <span class="n">top_hundred</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_l</span> <span class="o">=</span> <span class="nb">float</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_l_specific</span> <span class="o">=</span> <span class="nb">float</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">market_cap</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_coins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_coins_of_past</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portfolio</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices_past</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices_specific</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portfolio_from_past</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portfolio_from_past_specific</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CryptoPortfolio.regex_coins"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.regex_coins">[docs]</a>    <span class="k">def</span> <span class="nf">regex_coins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts crypto coins from a file using regex.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            :param file: The name of the file to extract coins from.</span>
+<span class="sd">            :type file: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file1</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">file1</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+        <span class="n">cryptos</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[A-Z]+[A-Z]+[A-Z]*[\s]+&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)]</span>
+        <span class="n">cryptos2</span> <span class="o">=</span> <span class="p">[</span><span class="n">crypto</span> <span class="k">for</span> <span class="n">crypto</span> <span class="ow">in</span> <span class="n">cryptos</span> <span class="k">if</span> <span class="s2">&quot; &quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">crypto</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cryptos2</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CryptoPortfolio.get_prices_df"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.get_prices_df">[docs]</a>    <span class="k">def</span> <span class="nf">get_prices_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scrapes the historical price data of selected coins and creates a DataFrame.</span>
+
+<span class="sd">        This function will save the prices DataFrame to a CSV file for future use.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coins</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_coins</span><span class="p">]</span>  <span class="c1"># cheating --&gt;stupid patch for coinmarket rate limit</span>
+
+        <span class="n">cryptos_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="c1"># scrap each coin of the coins list</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">coin</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coins</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">25</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sleeping for 1 min...&quot;</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">algos</span><span class="o">.</span><span class="n">scrap_coin</span><span class="p">(</span><span class="n">coin</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">coin</span><span class="si">}</span><span class="s2">_all_time&quot;</span><span class="p">)</span>  <span class="c1"># scraps the selected coins</span>
+            <span class="n">cryptos_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Close&quot;</span><span class="p">])</span>  <span class="c1"># keep the closing value column</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">market_cap</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Market Cap&quot;</span><span class="p">])</span>  <span class="c1"># append the historic data of MC for each coin</span>
+
+            <span class="c1"># assign the BTC date column as the date column of the prices df (BTC is the oldest)</span>
+            <span class="k">if</span> <span class="n">coin</span> <span class="o">==</span> <span class="s2">&quot;BTC&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]</span>
+                <span class="c1"># Use lambda function to apply __datetime to each element in the &quot;Date&quot; column</span>
+                <span class="c1"># self.date = self.date.apply(lambda date_str: algos.convert_to_datetime(date_str))</span>
+
+        <span class="c1"># =====================================================================</span>
+        <span class="c1"># Post Pros</span>
+        <span class="c1"># =====================================================================</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">cryptos_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># create the prices df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coins</span>  <span class="c1"># add the coin names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>  <span class="c1"># add the dates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>  <span class="c1"># set the date column as index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># drop the Date column</span>
+
+        <span class="c1"># df = self.df_prices.copy()</span>
+        <span class="c1"># # make nan the ico of each coin check AAVE Update: not needed anymore</span>
+        <span class="c1"># for i in df.columns:</span>
+        <span class="c1">#     j = 0</span>
+        <span class="c1">#     while j &lt; 2:</span>
+        <span class="c1">#         pos = df[i].last_valid_index()</span>
+        <span class="c1">#         df.at[pos, i] = np.nan</span>
+        <span class="c1">#         # df[i].loc[pos] = np.nan</span>
+        <span class="c1">#         j += 1</span>
+        <span class="c1"># self.df_prices = df.copy()</span>
+
+        <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">cd</span><span class="o">.</span><span class="n">move_files</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s2">&quot;../scrapped_data&quot;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_name</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CryptoPortfolio.get_market_cap_df"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.get_market_cap_df">[docs]</a>    <span class="k">def</span> <span class="nf">get_market_cap_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the DataFrame of all the coins&quot; market cap.</span>
+
+<span class="sd">        This function will save the market cap DataFrame to a CSV file for future use.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">market_cap</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_name</span><span class="si">}</span><span class="s2">_market_cap.csv&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CryptoPortfolio.validate_from_past"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.validate_from_past">[docs]</a>    <span class="k">def</span> <span class="nf">validate_from_past</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_n_coins</span><span class="p">,</span> <span class="n">_n_days</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span> <span class="n">_compounding</span><span class="p">,</span> <span class="n">_scrap</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs portfolio optimization based on past data and validates the results.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            :param _n_coins: Number of coins to consider for portfolio optimization.</span>
+<span class="sd">            :type _n_coins: int</span>
+
+<span class="sd">            :param _n_days: Number of days to consider for past data.</span>
+<span class="sd">            :type _n_days: int</span>
+
+<span class="sd">            :param _mu_method: Method for calculating expected returns. Possible values: &quot;mean&quot;, &quot;exp&quot;, &quot;capm&quot;.</span>
+<span class="sd">            :type _mu_method: str</span>
+
+<span class="sd">            :param _cov_method: Method for calculating covariance. Possible values: &quot;sample&quot;, &quot;exp&quot;.</span>
+<span class="sd">            :type _cov_method: str</span>
+
+<span class="sd">            :param _obj_function: Objective function for optimization.</span>
+<span class="sd">                                  Possible values: &quot;quadratic&quot;, &quot;sharpe&quot;, &quot;min_volat&quot;.</span>
+<span class="sd">            :type _obj_function: str</span>
+
+<span class="sd">            :param _compounding: Boolean flag indicating whether to drop missing values from the DataFrame.</span>
+<span class="sd">                                 Default is False.</span>
+<span class="sd">            :type _compounding: bool</span>
+
+<span class="sd">            :param _scrap: Boolean flag indicating whether to re-scrap data or use existing data.</span>
+<span class="sd">            :type _scrap: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_scrap</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_name</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_name</span><span class="si">}</span><span class="s2">_market_cap.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">df_mc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">_n_days</span><span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># see the market cap of the coins from the specific day</span>
+        <span class="n">df_365</span> <span class="o">=</span> <span class="n">df_mc</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># take the market cap of only that day</span>
+        <span class="n">df_365</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">coins</span> <span class="o">=</span> <span class="n">df_365</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">_n_coins</span><span class="p">,</span> <span class="p">)</span>  <span class="c1"># keep the n largest coins in terms of market cap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_coins_of_past</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">coins</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>  <span class="c1"># store the names in a list</span>
+
+        <span class="c1"># remove the stable coins, the shitty coins and the ones that you cannot buy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_coins_of_past</span> <span class="o">=</span> <span class="n">remove_unwanted_coins</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_coins_of_past</span><span class="p">)</span>
+
+        <span class="n">coin_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">coins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">coin_list</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_coins_of_past</span><span class="p">))</span>
+
+        <span class="c1"># self.df_prices = self.df_prices[coins]</span>
+
+        <span class="c1"># if self.hodl:</span>
+        <span class="c1"># if you hodl check the prices of today</span>
+        <span class="c1">#     prices_now = self.df_prices.iloc[0, :]</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     # if you trade check the prices after one year of the investment</span>
+        <span class="c1">#     prices_now = self.df_prices.iloc[_n_days - 365, :]</span>
+
+        <span class="n">prices_now</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="p">[</span><span class="n">coins</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># take the prices up to n_day</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices_past</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="p">[</span><span class="n">coins</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">_n_days</span><span class="p">:]</span>
+        <span class="c1"># take the prices of the n_day</span>
+        <span class="n">prices_past</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="p">[</span><span class="n">coins</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">_n_days</span><span class="p">]</span>
+
+        <span class="c1"># portfolio optimization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portfolio_from_past</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">algos</span><span class="o">.</span><span class="n">portfolio_optimization</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_prices_past</span><span class="p">,</span> <span class="n">coins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">budget</span><span class="p">,</span>
+                                                                             <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span>
+                                                                             <span class="n">_compounding</span><span class="p">)</span>
+
+        <span class="c1"># get profit_loss</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portfolio_from_past</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_l</span> <span class="o">=</span> <span class="n">algos</span><span class="o">.</span><span class="n">get_p_l</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portfolio_from_past</span><span class="p">,</span> <span class="n">prices_past</span><span class="p">,</span> <span class="n">prices_now</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CryptoPortfolio.validate_from_past_specific_dates"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.validate_from_past_specific_dates">[docs]</a>    <span class="k">def</span> <span class="nf">validate_from_past_specific_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_n_coins</span><span class="p">,</span> <span class="n">buy_date</span><span class="p">,</span> <span class="n">sell_date</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span>
+                                          <span class="n">_compounding</span><span class="p">,</span> <span class="n">_scrap</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform portfolio optimization based on historical data within specific buy and sell dates.</span>
+
+<span class="sd">        This method optimizes the cryptocurrency portfolio based on historical price data of selected coins,</span>
+<span class="sd">        considering a specific buy date and sell date. It calculates the optimized portfolio, expected returns,</span>
+<span class="sd">        and weights of each asset.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            :param _n_coins: Number of coins to consider for portfolio optimization.</span>
+<span class="sd">            :type _n_coins: int</span>
+
+<span class="sd">            :param buy_date: Number of days from the current date to the buy date for the historical data.</span>
+<span class="sd">            :type buy_date: int</span>
+
+<span class="sd">            :param sell_date: Number of days from the current date to the sell date for the historical data.</span>
+<span class="sd">            :type sell_date: int</span>
+
+<span class="sd">            :param _mu_method: Method for calculating expected returns. Possible values: &quot;mean&quot;, &quot;exp&quot;, &quot;capm&quot;.</span>
+<span class="sd">            :type _mu_method: str</span>
+
+<span class="sd">            :param _cov_method: Method for calculating covariance. Possible values: &quot;sample&quot;, &quot;exp&quot;.</span>
+<span class="sd">            :type _cov_method: str</span>
+
+<span class="sd">            :param _obj_function: Objective function for optimization.</span>
+<span class="sd">                                  Possible values: &quot;quadratic&quot;, &quot;sharpe&quot;, &quot;min_volat&quot;</span>
+<span class="sd">            :type _obj_function: str</span>
+
+<span class="sd">            :param _compounding: Boolean flag indicating whether to apply compounding to returns over time.</span>
+<span class="sd">            :type _compounding: bool</span>
+
+<span class="sd">            :param _scrap: Boolean flag indicating whether to re-scrape data or use existing data.</span>
+<span class="sd">            :type _scrap: bool, optional</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_scrap</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_name</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">date_str</span><span class="p">:</span>
+                                                                         <span class="n">algos</span><span class="o">.</span><span class="n">convert_to_datetime</span><span class="p">(</span><span class="n">date_str</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_name</span><span class="si">}</span><span class="s2">_market_cap.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">date_str</span><span class="p">:</span>
+                                                                                 <span class="n">algos</span><span class="o">.</span><span class="n">convert_to_datetime</span><span class="p">(</span><span class="n">date_str</span><span class="p">))</span>
+        <span class="n">df_mc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">current_date</span> <span class="o">=</span> <span class="n">df_mc</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">buy_timestamp</span> <span class="o">=</span> <span class="n">current_date</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">buy_date</span><span class="p">)</span>
+        <span class="n">sell_timestamp</span> <span class="o">=</span> <span class="n">current_date</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">sell_date</span><span class="p">)</span>
+
+        <span class="n">df_365</span> <span class="o">=</span> <span class="n">df_mc</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">buy_timestamp</span><span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># take the market cap of only that day</span>
+        <span class="n">df_365</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">coins</span> <span class="o">=</span> <span class="n">df_365</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">_n_coins</span><span class="p">,</span> <span class="p">)</span>  <span class="c1"># keep the n largest coins in terms of market cap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_coins_of_past</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">coins</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>  <span class="c1"># store the names in a list</span>
+
+        <span class="c1"># remove the stable coins, the shitty coins and the ones that you cannot buy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_coins_of_past</span> <span class="o">=</span> <span class="n">remove_unwanted_coins</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_coins_of_past</span><span class="p">)</span>
+
+        <span class="n">coin_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">coins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">coin_list</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_coins_of_past</span><span class="p">))</span>
+
+        <span class="c1"># self.df_prices = self.df_prices[coins]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices_specific</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">buy_timestamp</span><span class="p">:,</span> <span class="n">coins</span><span class="p">]</span>
+        <span class="c1"># take the prices up to n_day</span>
+        <span class="c1"># self.df_prices_specific2 = self.df_prices.loc[sell_timestamp:, :]</span>
+
+        <span class="n">sell_prices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sell_timestamp</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">buy_prices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">buy_timestamp</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_prices_specific</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices_specific</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># portfolio optimization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portfolio_from_past_specific</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">algos</span><span class="o">.</span><span class="n">portfolio_optimization</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_prices_specific</span><span class="p">,</span> <span class="n">coins</span><span class="p">,</span>
+                                                                                      <span class="bp">self</span><span class="o">.</span><span class="n">budget</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span>
+                                                                                      <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span>
+                                                                                      <span class="n">_compounding</span><span class="o">=</span><span class="n">_compounding</span><span class="p">)</span>
+
+        <span class="c1"># get profit_loss</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portfolio_from_past_specific</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_l_specific</span> <span class="o">=</span> <span class="n">algos</span><span class="o">.</span><span class="n">get_p_l</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portfolio_from_past_specific</span><span class="p">,</span>
+                                                                             <span class="n">buy_prices</span><span class="p">,</span> <span class="n">sell_prices</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CryptoPortfolio.optimize_portfolio"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.optimize_portfolio">[docs]</a>    <span class="k">def</span> <span class="nf">optimize_portfolio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_n_coins</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span> <span class="n">_compounding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">_scrap</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs portfolio optimization and creates the optimized portfolio DataFrame.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            :param _n_coins: Number of coins to consider for portfolio optimization.</span>
+<span class="sd">            :type _n_coins: int</span>
+
+<span class="sd">            :param _mu_method: Method for calculating expected returns. Possible values: &quot;mean&quot;, &quot;exp&quot;, &quot;capm&quot;.</span>
+<span class="sd">            :type _mu_method: str</span>
+
+<span class="sd">            :param _cov_method: Method for calculating covariance. Possible values: &quot;sample&quot;, &quot;exp&quot;.</span>
+<span class="sd">            :type _cov_method: str</span>
+
+<span class="sd">            :param _obj_function: Objective function for optimization. Possible values: &quot;quadratic&quot;, &quot;sharpe&quot;, &quot;min_volat&quot;.</span>
+<span class="sd">            :type _obj_function: str</span>
+
+<span class="sd">            :param _compounding: Boolean flag indicating whether to compound on mu. Default is False.</span>
+<span class="sd">            :type _compounding: bool</span>
+
+<span class="sd">            :param _scrap: Boolean flag indicating whether to re-scrap data or use existing data.</span>
+<span class="sd">            :type _scrap: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_scrap</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_name</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_name</span><span class="si">}</span><span class="s2">_market_cap.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">columns</span>
+
+        <span class="c1"># take the n coins of the largest market cap</span>
+        <span class="n">df_365</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_market_cap</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">coins</span> <span class="o">=</span> <span class="n">df_365</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">_n_coins</span><span class="p">,</span> <span class="p">)</span>
+        <span class="n">df_365</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_coins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">coins</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="c1"># remove the stable coins, the shitty coins and the ones that you cannot buy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_coins</span> <span class="o">=</span> <span class="n">remove_unwanted_coins</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_coins</span><span class="p">)</span>
+
+        <span class="n">coin_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">coins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">coin_list</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_coins</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_coins</span> <span class="o">=</span> <span class="n">coins</span>
+
+        <span class="n">portfolio</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">algos</span><span class="o">.</span><span class="n">portfolio_optimization</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_coins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">budget</span><span class="p">,</span>
+                                                              <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span> <span class="n">_compounding</span><span class="p">)</span>
+
+        <span class="n">coins_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">amount_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">n_coins_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">coin</span><span class="p">,</span> <span class="n">amount</span> <span class="ow">in</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">price</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_prices</span><span class="p">[</span><span class="n">coin</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">n_coins_bought</span> <span class="o">=</span> <span class="n">amount</span> <span class="o">/</span> <span class="n">price</span>
+            <span class="n">coins_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coin</span><span class="p">)</span>
+            <span class="n">amount_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
+            <span class="n">n_coins_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n_coins_bought</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">portfolio</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Coin&quot;</span><span class="p">:</span> <span class="n">coins_list</span><span class="p">,</span> <span class="s2">&quot;Amount&quot;</span><span class="p">:</span> <span class="n">amount_list</span><span class="p">,</span> <span class="s2">&quot;n_coins&quot;</span><span class="p">:</span> <span class="n">n_coins_list</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portfolio</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Amount&quot;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CryptoPortfolio.data_pipeline"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.data_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">data_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the data pipeline to scrape cryptocurrency price data and market cap data.</span>
+
+<span class="sd">        This method calls the &#39;get_prices_df()&#39; and &#39;get_market_cap_df()&#39; methods to scrape the historical price</span>
+<span class="sd">        data and market cap data of selected coins and saves the data to CSV files for future use.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_prices_df</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_market_cap_df</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CryptoPortfolio.post_pros_pipeline"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.post_pros_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">post_pros_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_n_coins</span><span class="p">,</span> <span class="n">_n_days</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span> <span class="n">_compounding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                           <span class="n">_scrap</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the post-processing pipeline to perform portfolio optimization and validation.</span>
+
+<span class="sd">        This method calls the &#39;validate_from_past()&#39; and &#39;optimize_portfolio()&#39; methods to perform portfolio</span>
+<span class="sd">        optimization based on past data and create the optimized portfolio DataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_from_past</span><span class="p">(</span><span class="n">_n_coins</span><span class="p">,</span> <span class="n">_n_days</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span> <span class="n">_compounding</span><span class="o">=</span><span class="n">_compounding</span><span class="p">,</span>
+                                <span class="n">_scrap</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimize_portfolio</span><span class="p">(</span><span class="n">_n_coins</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span> <span class="n">_compounding</span><span class="o">=</span><span class="n">_compounding</span><span class="p">,</span>
+                                <span class="n">_scrap</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CryptoPortfolio.run_all"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.cryptorama.CryptoPortfolio.run_all">[docs]</a>    <span class="k">def</span> <span class="nf">run_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">_n_coins</span><span class="p">,</span> <span class="n">_n_days</span><span class="p">,</span> <span class="n">sell_date</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span> <span class="n">_compounding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">_scrap</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the entire pipeline for cryptocurrency data analysis and portfolio optimization.</span>
+
+<span class="sd">        This method calls the following methods in sequence:</span>
+<span class="sd">            1. &#39;regex_coins()&#39;: Extracts crypto coins from a file using regex.</span>
+<span class="sd">            2. &#39;get_prices()&#39;: Scrapes the historical price data of selected coins and creates a DataFrame.</span>
+<span class="sd">            3. &#39;get_market_cap_df()&#39;: Creates the DataFrame of all the coins&#39; market cap.</span>
+<span class="sd">            4. &#39;validate_from_past()&#39;: Performs portfolio optimization based on past data and validates the results.</span>
+<span class="sd">            5. &#39;optimize_portfolio()&#39;: Performs portfolio optimization and creates the optimized portfolio DataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_coins</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_prices_df</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_market_cap_df</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimize_portfolio</span><span class="p">(</span><span class="n">_n_coins</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span> <span class="n">_compounding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">_scrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_from_past</span><span class="p">(</span><span class="n">_n_coins</span><span class="p">,</span> <span class="n">_n_days</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span> <span class="n">_compounding</span><span class="p">,</span> <span class="n">_scrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_from_past_specific_dates</span><span class="p">(</span><span class="n">_n_coins</span><span class="p">,</span> <span class="n">_n_days</span><span class="p">,</span> <span class="n">sell_date</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span>
+                                               <span class="n">_compounding</span><span class="p">,</span> <span class="n">_scrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">top_100</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">n_coins</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">n_days</span> <span class="o">=</span> <span class="mi">365</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">mu_method</span> <span class="o">=</span> <span class="s2">&quot;capm&quot;</span>
+    <span class="n">cov_method</span> <span class="o">=</span> <span class="s2">&quot;exp&quot;</span>
+    <span class="n">obj_function</span> <span class="o">=</span> <span class="s2">&quot;sharpe&quot;</span>
+    <span class="n">drop</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">budget</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">hodl</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">scrap</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">save_to</span> <span class="o">=</span> <span class="s2">&quot;./new_data&quot;</span>
+    <span class="n">crypto_class_20c</span> <span class="o">=</span> <span class="n">CryptoPortfolio</span><span class="p">(</span><span class="n">top_100</span><span class="p">,</span> <span class="n">budget</span><span class="p">,</span> <span class="n">n_coins</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="n">save_to</span><span class="p">)</span>
+
+    <span class="c1"># crypto_class_20c.get_prices_df()</span>
+    <span class="c1"># crypto_class_20c.get_market_cap_df()</span>
+    <span class="c1"># crypto_class_20c.validate_from_past(n_coins, n_days, mu_method, cov_method, obj_function, drop, scrap)</span>
+    <span class="n">crypto_class_20c</span><span class="o">.</span><span class="n">optimize_portfolio</span><span class="p">(</span><span class="n">n_coins</span><span class="p">,</span> <span class="n">mu_method</span><span class="p">,</span> <span class="n">cov_method</span><span class="p">,</span> <span class="n">obj_function</span><span class="p">,</span> <span class="n">drop</span><span class="p">,</span> <span class="n">scrap</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">n_coins=</span><span class="si">{</span><span class="n">n_coins</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">crypto_class_20c</span><span class="o">.</span><span class="n">portfolio</span><span class="p">)</span>
+
+    <span class="c1"># n_coins = 10</span>
+    <span class="c1"># crypto_class_10c = Cryptos(top_100, budget, n_coins, hodl)</span>
+    <span class="c1"># crypto_class_10c.optimize_portfolio(n_coins, mu_method, cov_method, obj_function, drop, scrap)</span>
+    <span class="c1"># print(f&quot;\nn_coins={n_coins}\n&quot;)</span>
+    <span class="c1"># print(crypto_class_10c.portfolio)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, pickledim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

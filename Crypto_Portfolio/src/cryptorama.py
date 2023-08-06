@@ -17,13 +17,13 @@ base_dir = BASE_DIR
 def remove_unwanted_coins(coins_list):
     """
     Remove unwanted coins from the list of coins.
-
     This function removes stablecoins, shitty coins, and coins that cannot be bought.
 
-    :param coins_list: List of coins to filter.
-    :type coins_list: list[str]
-    :return: List of coins after filtering.
-    :rtype: list[str]
+    Parameters:
+        :param coins_list: List of coins to filter.
+        :type coins_list: list[str]
+        :return: List of coins after filtering.
+        :rtype: list[str]
     """
     stablecoins = ["USDT", "USDC", "CUSDC", "BUSD", "UST", "PAX", "DAI", "CDAI", "HUSD", "TUSD", "USDN", "CUSDT",
                    "USDP"]
@@ -40,22 +40,50 @@ class CryptoPortfolio:
     A class for performing cryptocurrency data analysis and portfolio optimization.
 
     Attributes:
-        top_hundred (bool): Flag to choose between top 100 and top 1000 coins.
-        _budget (float): The total budget for the portfolio.
-        _n_coins (int): The number of coins to consider for portfolio optimization.
-        coins (list): List of cryptocurrency coins.
-        csv_name (str): Name of the CSV file to save the scraped data.
-        budget (float): The total budget for the portfolio.
-        p_l (int): Profit-loss of the selected coins.
-        selected_coins_of_past (list): List of selected coins for the past portfolio.
-        selected_coins (list): List of selected coins for the current portfolio.
-        market_cap (list): List containing historic market cap data for each coin.
-        date (pd.DataFrame): DataFrame containing date information for price data.
-        df_prices (pd.DataFrame): DataFrame containing historical price data of selected coins.
-        df_market_cap (pd.DataFrame): DataFrame containing historical market cap data of selected coins.
-        df_prices_past (pd.DataFrame): DataFrame containing historical price data up to a specific number of days.
-        portfolio_from_past (pd.DataFrame): DataFrame representing the optimized portfolio for the past.
-        portfolio (pd.DataFrame): DataFrame representing the current optimized portfolio.
+        :attr top_hundred: Flag to choose between top 100 and top 1000 coins.
+        :type top_hundred: bool
+        :attr _budget: The total budget for the portfolio.
+        :type _budget: float
+        :attr _n_coins: The number of coins to consider for portfolio optimization.
+        :type _n_coins: int
+        :attr coins: List of cryptocurrency coins.
+        :type coins: list
+        :attr csv_name: Name of the CSV file to save the scraped data.
+        :type csv_name: str
+        :attr budget: The total budget for the portfolio.
+        :type budget: float
+        :attr p_l: Profit-loss of the selected coins.
+        :type p_l: int
+        :attr selected_coins_of_past: List of selected coins for the past portfolio.
+        :type selected_coins_of_past: list
+        :attr selected_coins: List of selected coins for the current portfolio.
+        :type selected_coins: list
+        :attr market_cap: List containing historic market cap data for each coin.
+        :type market_cap: list
+        :attr date: DataFrame containing date information for price data.
+        :type date: pandas.DataFrame
+        :attr df_prices: DataFrame containing historical price data of selected coins.
+        :type df_prices: pandas.DataFrame
+        :attr df_market_cap: DataFrame containing historical market cap data of selected coins.
+        :type df_market_cap: pandas.DataFrame
+        :attr df_prices_past: DataFrame containing historical price data up to a specific number of days.
+        :type df_prices_past: pandas.DataFrame
+        :attr portfolio_from_past: DataFrame representing the optimized portfolio for the past.
+        :type portfolio_from_past: pandas.DataFrame
+        :attr portfolio: DataFrame representing the current optimized portfolio.
+        :type portfolio: pandas.DataFrame
+
+    Methods:
+        :meth __init__: Initialize the CryptoPortfolio with provided parameters.
+        :meth regex_coins: Extract cryptocurrency coins from a text file using regex.
+        :meth get_prices_df: Get a DataFrame containing historical price data of selected coins.
+        :meth get_market_cap_df: Get a DataFrame containing historical market cap data of selected coins.
+        :meth validate_from_past: Validate the portfolio from the past.
+        :meth validate_from_past_specific_dates: Validate the portfolio from past specific dates.
+        :meth optimize_portfolio: Optimize the portfolio for a given set of inputs.
+        :meth data_pipeline: Execute the data processing pipeline.
+        :meth post_pros_pipeline: Execute the post-processing pipeline.
+        :meth run_all: Run all the steps of the portfolio optimization process.
     """
 
     def __init__(self, top_hundred, _budget, _n_coins, save_dir):
@@ -111,8 +139,9 @@ class CryptoPortfolio:
         """
         Extracts crypto coins from a file using regex.
 
-        :param file: The name of the file to extract coins from.
-        :type file: str
+        Parameters:
+            :param file: The name of the file to extract coins from.
+            :type file: str
         """
 
         with open(file, "r") as file1:
@@ -208,11 +237,11 @@ class CryptoPortfolio:
             :type _cov_method: str
 
             :param _obj_function: Objective function for optimization.
-            Possible values: "quadratic", "sharpe", "min_volat".
+                                  Possible values: "quadratic", "sharpe", "min_volat".
             :type _obj_function: str
 
             :param _compounding: Boolean flag indicating whether to drop missing values from the DataFrame.
-            Default is False.
+                                 Default is False.
             :type _compounding: bool
 
             :param _scrap: Boolean flag indicating whether to re-scrap data or use existing data.
@@ -261,41 +290,41 @@ class CryptoPortfolio:
     def validate_from_past_specific_dates(self, _n_coins, buy_date, sell_date, _mu_method, _cov_method, _obj_function,
                                           _compounding, _scrap=False):
         """
-            Perform portfolio optimization based on historical data within specific buy and sell dates.
+        Perform portfolio optimization based on historical data within specific buy and sell dates.
 
-            This method optimizes the cryptocurrency portfolio based on historical price data of selected coins,
-            considering a specific buy date and sell date. It calculates the optimized portfolio, expected returns,
-            and weights of each asset.
+        This method optimizes the cryptocurrency portfolio based on historical price data of selected coins,
+        considering a specific buy date and sell date. It calculates the optimized portfolio, expected returns,
+        and weights of each asset.
 
-            Parameters:
-                :param _n_coins: Number of coins to consider for portfolio optimization.
-                :type _n_coins: int
+        Parameters:
+            :param _n_coins: Number of coins to consider for portfolio optimization.
+            :type _n_coins: int
 
-                :param buy_date: Number of days from the current date to the buy date for the historical data.
-                :type buy_date: int
+            :param buy_date: Number of days from the current date to the buy date for the historical data.
+            :type buy_date: int
 
-                :param sell_date: Number of days from the current date to the sell date for the historical data.
-                :type sell_date: int
+            :param sell_date: Number of days from the current date to the sell date for the historical data.
+            :type sell_date: int
 
-                :param _mu_method: Method for calculating expected returns. Possible values: "mean", "exp", "capm".
-                :type _mu_method: str
+            :param _mu_method: Method for calculating expected returns. Possible values: "mean", "exp", "capm".
+            :type _mu_method: str
 
-                :param _cov_method: Method for calculating covariance. Possible values: "sample", "exp".
-                :type _cov_method: str
+            :param _cov_method: Method for calculating covariance. Possible values: "sample", "exp".
+            :type _cov_method: str
 
-                :param _obj_function: Objective function for optimization.
-                Possible values: "quadratic", "sharpe", "min_volat"
-                :type _obj_function: str
+            :param _obj_function: Objective function for optimization.
+                                  Possible values: "quadratic", "sharpe", "min_volat"
+            :type _obj_function: str
 
-                :param _compounding: Boolean flag indicating whether to apply compounding to returns over time.
-                :type _compounding: bool
+            :param _compounding: Boolean flag indicating whether to apply compounding to returns over time.
+            :type _compounding: bool
 
-                :param _scrap: Boolean flag indicating whether to re-scrape data or use existing data.
-                :type _scrap: bool, optional
+            :param _scrap: Boolean flag indicating whether to re-scrape data or use existing data.
+            :type _scrap: bool, optional
 
-            Returns:
-                :return: None
-            """
+        Returns:
+            :return: None
+        """
 
         if not _scrap:
             self.df_prices = pd.read_csv(f"{self.save_dir}/{self.csv_name}.csv", index_col=0)
@@ -345,23 +374,24 @@ class CryptoPortfolio:
         """
         Performs portfolio optimization and creates the optimized portfolio DataFrame.
 
-        :param _n_coins: Number of coins to consider for portfolio optimization.
-        :type _n_coins: int
+        Parameters:
+            :param _n_coins: Number of coins to consider for portfolio optimization.
+            :type _n_coins: int
 
-        :param _mu_method: Method for calculating expected returns. Possible values: "mean", "exp", "capm".
-        :type _mu_method: str
+            :param _mu_method: Method for calculating expected returns. Possible values: "mean", "exp", "capm".
+            :type _mu_method: str
 
-        :param _cov_method: Method for calculating covariance. Possible values: "sample", "exp".
-        :type _cov_method: str
+            :param _cov_method: Method for calculating covariance. Possible values: "sample", "exp".
+            :type _cov_method: str
 
-        :param _obj_function: Objective function for optimization. Possible values: "quadratic", "sharpe", "min_volat".
-        :type _obj_function: str
+            :param _obj_function: Objective function for optimization. Possible values: "quadratic", "sharpe", "min_volat".
+            :type _obj_function: str
 
-        :param _compounding: Boolean flag indicating whether to compound on mu. Default is False.
-        :type _compounding: bool
+            :param _compounding: Boolean flag indicating whether to compound on mu. Default is False.
+            :type _compounding: bool
 
-        :param _scrap: Boolean flag indicating whether to re-scrap data or use existing data.
-        :type _scrap: bool
+            :param _scrap: Boolean flag indicating whether to re-scrap data or use existing data.
+            :type _scrap: bool
         """
 
         if not _scrap:
@@ -430,11 +460,11 @@ class CryptoPortfolio:
         Run the entire pipeline for cryptocurrency data analysis and portfolio optimization.
 
         This method calls the following methods in sequence:
-        1. 'regex_coins()': Extracts crypto coins from a file using regex.
-        2. 'get_prices()': Scrapes the historical price data of selected coins and creates a DataFrame.
-        3. 'get_market_cap_df()': Creates the DataFrame of all the coins' market cap.
-        4. 'validate_from_past()': Performs portfolio optimization based on past data and validates the results.
-        5. 'optimize_portfolio()': Performs portfolio optimization and creates the optimized portfolio DataFrame.
+            1. 'regex_coins()': Extracts crypto coins from a file using regex.
+            2. 'get_prices()': Scrapes the historical price data of selected coins and creates a DataFrame.
+            3. 'get_market_cap_df()': Creates the DataFrame of all the coins' market cap.
+            4. 'validate_from_past()': Performs portfolio optimization based on past data and validates the results.
+            5. 'optimize_portfolio()': Performs portfolio optimization and creates the optimized portfolio DataFrame.
         """
 
         self.regex_coins(file)

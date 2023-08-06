@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto_Portfolio.src.generic_algorithms &mdash; Crypto Portfolio Optimization  documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Crypto Portfolio Optimization
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Cryptos_Updated</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Crypto Portfolio Optimization</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Crypto_Portfolio.src.generic_algorithms</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Crypto_Portfolio.src.generic_algorithms</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+
+<span class="kn">from</span> <span class="nn">pypfopt</span> <span class="kn">import</span> <span class="n">risk_models</span>
+<span class="kn">from</span> <span class="nn">pypfopt</span> <span class="kn">import</span> <span class="n">expected_returns</span>
+<span class="kn">from</span> <span class="nn">pypfopt.efficient_frontier</span> <span class="kn">import</span> <span class="n">EfficientFrontier</span>
+
+
+<span class="kn">from</span> <span class="nn">cryptocmd</span> <span class="kn">import</span> <span class="n">CmcScraper</span>
+
+
+<div class="viewcode-block" id="convert_to_datetime"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.generic_algorithms.convert_to_datetime">[docs]</a><span class="k">def</span> <span class="nf">convert_to_datetime</span><span class="p">(</span><span class="n">date_str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a date string to a datetime object.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        :param date_str: The input date string in the format &quot;%Y-%m-%d&quot;.</span>
+<span class="sd">        :type date_str: str</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :return: A datetime object representing the input date.</span>
+<span class="sd">        :rtype: datetime.datetime</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="remove_coins"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.generic_algorithms.remove_coins">[docs]</a><span class="k">def</span> <span class="nf">remove_coins</span><span class="p">(</span><span class="n">to_remove</span><span class="p">,</span> <span class="n">selected_coins</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes specified coins from the selected coins list.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        :param to_remove: A list of coins to be removed from the selected coins list.</span>
+<span class="sd">        :type to_remove: list</span>
+
+<span class="sd">        :param selected_coins: The list of selected coins.</span>
+<span class="sd">        :type selected_coins: list</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :return: The updated list of selected coins after removal.</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">coin</span> <span class="ow">in</span> <span class="n">to_remove</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">selected_coins</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">coin</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">selected_coins</span></div>
+
+
+<div class="viewcode-block" id="scrap_coin"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.generic_algorithms.scrap_coin">[docs]</a><span class="k">def</span> <span class="nf">scrap_coin</span><span class="p">(</span><span class="n">coin</span><span class="p">,</span> <span class="n">coin_csv_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scrapes data for a specific coin from a data source (Coingecko or similar).</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        :param coin: The name or symbol of the coin to scrape data for.</span>
+<span class="sd">        :type coin: str</span>
+
+<span class="sd">        :param coin_csv_name: The name of the CSV file to export the scraped data.</span>
+<span class="sd">        :type coin_csv_name: str</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :return: A pandas DataFrame containing the scraped data for the specified coin.</span>
+<span class="sd">        :rtype: pandas.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># TO DO check a lib for coingecko --&gt; more reliable</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> ===== </span><span class="si">{</span><span class="n">coin</span><span class="si">}</span><span class="s2"> ===== </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># initialise scraper without time interval</span>
+    <span class="n">scraper</span> <span class="o">=</span> <span class="n">CmcScraper</span><span class="p">(</span><span class="n">coin</span><span class="p">)</span>
+
+    <span class="c1"># export the data as csv file, you can also pass optional `name` parameter</span>
+    <span class="n">scraper</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">coin_csv_name</span><span class="p">)</span>
+
+    <span class="c1"># Pandas dataFrame for the same data</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">scraper</span><span class="o">.</span><span class="n">get_dataframe</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="regularize"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.generic_algorithms.regularize">[docs]</a><span class="k">def</span> <span class="nf">regularize</span><span class="p">(</span><span class="n">weights</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Regularizes the weights of a portfolio.</span>
+
+<span class="sd">    The function takes a dictionary of weights as input, where the keys represent coin names or symbols,</span>
+<span class="sd">    and the values represent the corresponding percentage weights. The function scales the weights to ensure</span>
+<span class="sd">    that their sum equals 1, making it a valid weight distribution for a portfolio.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        :param weights: A dictionary containing coin names or symbols as keys and their corresponding percentage</span>
+<span class="sd">                        weights as values.</span>
+<span class="sd">        :type weights: dict</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :return: The updated weights dictionary with regularized values, where the sum of all weights equals 1.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">total_weight</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">total_weight</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cannot regularize the weights. All weights are zero.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">weights</span>
+
+    <span class="k">for</span> <span class="n">coin</span><span class="p">,</span> <span class="n">perc</span> <span class="ow">in</span> <span class="n">weights</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">weights</span><span class="p">[</span><span class="n">coin</span><span class="p">]</span> <span class="o">=</span> <span class="n">perc</span> <span class="o">/</span> <span class="n">total_weight</span>
+
+    <span class="k">return</span> <span class="n">weights</span></div>
+
+
+<div class="viewcode-block" id="filter_columns_by_data_span"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.generic_algorithms.filter_columns_by_data_span">[docs]</a><span class="k">def</span> <span class="nf">filter_columns_by_data_span</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">min_data_span_days</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Filters columns in a DataFrame based on the time span of available data.</span>
+
+<span class="sd">    The function iterates through each column in the DataFrame and checks the time span</span>
+<span class="sd">    between the first and last valid index of each column. If the time span is less than</span>
+<span class="sd">    the specified minimum data span (in days), the column is marked for removal. After</span>
+<span class="sd">    processing all columns, the marked columns are dropped from the DataFrame.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        :param data: The DataFrame containing the data to be filtered.</span>
+<span class="sd">        :type data: pandas.DataFrame</span>
+
+<span class="sd">        :param min_data_span_days: The minimum data span in days to retain a column. Default is 60.</span>
+<span class="sd">        :type min_data_span_days: int</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :return: The DataFrame with columns filtered based on data span.</span>
+<span class="sd">        :rtype: pandas.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">columns_to_drop</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">pos1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">token</span><span class="p">]</span><span class="o">.</span><span class="n">last_valid_index</span><span class="p">()</span>
+        <span class="n">pos2</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">token</span><span class="p">]</span><span class="o">.</span><span class="n">first_valid_index</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">pos1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">pos2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">pos1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">pos2</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">convert_to_datetime</span><span class="p">(</span><span class="n">pos1</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">convert_to_datetime</span><span class="p">(</span><span class="n">pos2</span><span class="p">)</span>
+                <span class="n">delta</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">delta</span> <span class="o">=</span> <span class="n">pos2</span> <span class="o">-</span> <span class="n">pos1</span>
+            <span class="k">if</span> <span class="n">delta</span><span class="o">.</span><span class="n">days</span> <span class="o">&lt;</span> <span class="n">min_data_span_days</span><span class="p">:</span>
+                <span class="n">columns_to_drop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">columns_to_drop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+
+    <span class="n">data_filtered</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns_to_drop</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data_filtered</span></div>
+
+
+<div class="viewcode-block" id="portfolio_optimization"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.generic_algorithms.portfolio_optimization">[docs]</a><span class="k">def</span> <span class="nf">portfolio_optimization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">selected_coins</span><span class="p">,</span> <span class="n">_budget</span><span class="p">,</span> <span class="n">_mu_method</span><span class="p">,</span> <span class="n">_cov_method</span><span class="p">,</span> <span class="n">_obj_function</span><span class="p">,</span> <span class="n">_compounding</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform portfolio optimization using the Efficient Frontier approach.</span>
+
+<span class="sd">    The function takes historical price data (DataFrame) of selected coins, budget,</span>
+<span class="sd">    method for calculating expected returns, method for calculating covariance, objective</span>
+<span class="sd">    function for optimization, and a boolean flag for dropping missing values.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        :param df: DataFrame containing historical price data of selected coins.</span>
+<span class="sd">        :type df: pandas.DataFrame</span>
+
+<span class="sd">        :param selected_coins: List of selected coin names or symbols from the DataFrame.</span>
+<span class="sd">        :type selected_coins: list</span>
+
+<span class="sd">        :param _budget: The total budget for the portfolio.</span>
+<span class="sd">        :type _budget: float</span>
+
+<span class="sd">        :param _mu_method: Method for calculating expected returns.</span>
+<span class="sd">                           Possible values: &quot;mean&quot;, &quot;exp&quot;, &quot;capm&quot;.</span>
+<span class="sd">        :type _mu_method: str</span>
+
+<span class="sd">        :param _cov_method: Method for calculating covariance.</span>
+<span class="sd">                            Possible values: &quot;sample&quot;, &quot;exp&quot;.</span>
+<span class="sd">        :type _cov_method: str</span>
+
+<span class="sd">        :param _obj_function: Objective function for optimization.</span>
+<span class="sd">                              Possible values: &quot;quadratic&quot;, &quot;sharpe&quot;, &quot;min_volat&quot;.</span>
+<span class="sd">        :type _obj_function: str</span>
+
+<span class="sd">        :param _compounding: Boolean flag indicating whether to compound the mean. Default is False.</span>
+<span class="sd">        :type _compounding: bool</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :return: A dictionary containing the optimized portfolio with coin names as keys and</span>
+<span class="sd">                 investment values as values, a pandas Series representing the calculated expected returns</span>
+<span class="sd">                 for the selected coins, a dictionary with cleaned and adjusted weights for the optimized portfolio.</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">mu_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">expected_returns</span><span class="o">.</span><span class="n">mean_historical_return</span><span class="p">,</span>
+        <span class="s2">&quot;exp&quot;</span><span class="p">:</span> <span class="n">expected_returns</span><span class="o">.</span><span class="n">ema_historical_return</span><span class="p">,</span>
+        <span class="s2">&quot;capm&quot;</span><span class="p">:</span> <span class="n">expected_returns</span><span class="o">.</span><span class="n">capm_return</span>
+    <span class="p">}</span>
+
+    <span class="n">cov_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;sample&quot;</span><span class="p">:</span> <span class="n">risk_models</span><span class="o">.</span><span class="n">sample_cov</span><span class="p">,</span>
+        <span class="s2">&quot;exp&quot;</span><span class="p">:</span> <span class="n">risk_models</span><span class="o">.</span><span class="n">exp_cov</span>
+    <span class="p">}</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">selected_coins</span><span class="p">]</span>
+
+    <span class="c1"># TODO: check if my theory is correct (since mu is multiplied by frequency the tokens should at least be in the</span>
+    <span class="c1">#  market for 1 year)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Each column represents the historical daily returns for a specific token.</span>
+
+<span class="sd">    For the formula to be valid, you need to have at least 365 non-NaN data points for each token. </span>
+<span class="sd">    If any token has fewer than 365 non-NaN data points, you won&#39;t be able to accurately calculate the </span>
+<span class="sd">    compounded return over 365 days for that token.</span>
+
+<span class="sd">    In summary, for each token column, you should have at least 365 non-NaN data points to use the formula correctly. </span>
+<span class="sd">    If a token has fewer data points, you should consider using a different frequency or excluding that token from </span>
+<span class="sd">    the analysis to ensure meaningful results.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># keep the coins that are in the market for at least 1 year</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">filter_columns_by_data_span</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">min_data_span_days</span><span class="o">=</span><span class="mi">365</span><span class="p">)</span>
+
+    <span class="c1"># if _drop:</span>
+    <span class="c1">#     df.dropna(inplace=True)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Calculate expected returns and covariance</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">mu_mapping</span><span class="p">[</span><span class="n">_mu_method</span><span class="p">](</span><span class="n">df</span><span class="p">,</span> <span class="n">compounding</span><span class="o">=</span><span class="n">_compounding</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="mi">365</span><span class="p">)</span>
+    <span class="n">mu</span><span class="o">.</span><span class="n">replace</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mu</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># print(mu)</span>
+    <span class="n">ind_list</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">ind_list</span><span class="p">]</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">cov_mapping</span><span class="p">[</span><span class="n">_cov_method</span><span class="p">](</span><span class="n">df</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="mi">365</span><span class="p">)</span>
+
+    <span class="c1"># Optimize for maximal Sharpe ratio</span>
+    <span class="n">ef</span> <span class="o">=</span> <span class="n">EfficientFrontier</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">weight_bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">obj_f_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;quadratic&quot;</span><span class="p">:</span> <span class="n">ef</span><span class="o">.</span><span class="n">max_quadratic_utility</span><span class="p">,</span>
+        <span class="s2">&quot;sharpe&quot;</span><span class="p">:</span> <span class="n">ef</span><span class="o">.</span><span class="n">max_sharpe</span><span class="p">,</span>
+        <span class="s2">&quot;min_volat&quot;</span><span class="p">:</span> <span class="n">ef</span><span class="o">.</span><span class="n">min_volatility</span>
+    <span class="p">}</span>
+
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">obj_f_mapping</span><span class="p">[</span><span class="n">_obj_function</span><span class="p">]()</span>
+    <span class="n">clean_weights</span> <span class="o">=</span> <span class="n">ef</span><span class="o">.</span><span class="n">clean_weights</span><span class="p">()</span>
+    <span class="n">clean_weights</span> <span class="o">=</span> <span class="n">regularize</span><span class="p">(</span><span class="n">clean_weights</span><span class="p">)</span>
+
+    <span class="n">ef</span><span class="o">.</span><span class="n">portfolio_performance</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">port</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">coin</span><span class="p">,</span> <span class="n">perc</span> <span class="ow">in</span> <span class="n">clean_weights</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">perc</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">port</span><span class="p">[</span><span class="n">coin</span><span class="p">]</span> <span class="o">=</span> <span class="n">perc</span> <span class="o">*</span> <span class="n">_budget</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invest </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">port</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">port</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">clean_weights</span></div>
+
+
+<div class="viewcode-block" id="get_p_l"><a class="viewcode-back" href="../../../Crypto_Portfolio.src.html#Crypto_Portfolio.src.generic_algorithms.get_p_l">[docs]</a><span class="k">def</span> <span class="nf">get_p_l</span><span class="p">(</span><span class="n">portfolio</span><span class="p">,</span> <span class="n">in_price_coins</span><span class="p">,</span> <span class="n">final_price_coins</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the profit-loss of the selected coins in the portfolio.</span>
+
+<span class="sd">    The function takes an optimized portfolio dictionary, initial prices of the coins series,</span>
+<span class="sd">    and final prices of the coins series as inputs.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        :param portfolio: The optimized portfolio dictionary with coin names as keys and investment values as values.</span>
+<span class="sd">        :type portfolio: dict</span>
+
+<span class="sd">        :param in_price_coins: A Series containing the initial prices of the coins series, with coin names as keys</span>
+<span class="sd">                               and prices as values.</span>
+<span class="sd">        :type in_price_coins: pd.Series</span>
+
+<span class="sd">        :param final_price_coins: A Series containing the final prices of the coins series, with coin names as keys</span>
+<span class="sd">                                  and prices as values.</span>
+<span class="sd">        :type final_price_coins: pd.Series</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :return: A DataFrame representing the portfolio with columns &quot;Coin&quot;, &quot;Amount&quot;, and &quot;n_coins&quot;,</span>
+<span class="sd">                 and the calculated profit-loss (p_l) for the selected coins.</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">p_l</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">coins_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">amount_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">n_coins_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">coin</span><span class="p">,</span> <span class="n">amount</span> <span class="ow">in</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">in_price</span> <span class="o">=</span> <span class="n">in_price_coins</span><span class="p">[</span><span class="n">coin</span><span class="p">]</span>
+        <span class="n">fin_price</span> <span class="o">=</span> <span class="n">final_price_coins</span><span class="p">[</span><span class="n">coin</span><span class="p">]</span>
+        <span class="n">n_coins_bought</span> <span class="o">=</span> <span class="n">amount</span> <span class="o">/</span> <span class="n">in_price</span>
+        <span class="n">coins_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coin</span><span class="p">)</span>
+        <span class="n">amount_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
+        <span class="n">n_coins_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n_coins_bought</span><span class="p">)</span>
+        <span class="n">p_l</span> <span class="o">+=</span> <span class="n">n_coins_bought</span> <span class="o">*</span> <span class="p">(</span><span class="n">fin_price</span> <span class="o">-</span> <span class="n">in_price</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Profit Loss: </span><span class="si">{</span><span class="n">p_l</span><span class="si">}</span><span class="s2">e</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">portfolio</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Coin&quot;</span><span class="p">:</span> <span class="n">coins_list</span><span class="p">,</span> <span class="s2">&quot;Amount&quot;</span><span class="p">:</span> <span class="n">amount_list</span><span class="p">,</span> <span class="s2">&quot;n_coins&quot;</span><span class="p">:</span> <span class="n">n_coins_list</span><span class="p">})</span>
+    <span class="n">portfolio</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Amount&quot;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">portfolio</span><span class="p">,</span> <span class="n">p_l</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, pickledim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
