@@ -27,10 +27,10 @@ def remove_unwanted_coins(coins_list):
     """
     stablecoins = ["USDT", "USDC", "CUSDC", "BUSD", "UST", "PAX", "DAI", "CDAI", "HUSD", "TUSD", "USDN", "CUSDT",
                    "USDP"]
-    shitty_coins = ["SHIB", "DOGE", "XDC", "LEO"]
+    shitty_coins = ["SHIB", "DOGE", "XDC", "LEO", "BNB"]
 
     coins_list = algos.remove_coins(stablecoins, coins_list)
-    coins_list = algos.remove_coins(shitty_coins, coins_list)
+    # coins_list = algos.remove_coins(shitty_coins, coins_list)
 
     return coins_list
 
@@ -103,13 +103,13 @@ class CryptoPortfolio:
 
         if top_hundred:
             # load the top100 coins
-            with open(f"{base_dir}/new_data/top_100.pickle", "rb") \
+            with open(f"{base_dir}/new_data/top_coins_short_list.pickle", "rb") \
                     as input_file:
                 self.coins = list(pickle.load(input_file))
             self.csv_name = "Top_100_cryptos"
         else:
             # load all the crypto coins
-            with open(f"{base_dir}/legacy_data/top_1000.pickle", "rb") \
+            with open(f"{base_dir}/legacy_data/top_coins_long_list.pickle", "rb") \
                     as input_file:
                 self.coins = list(pickle.load(input_file))
             self.csv_name = "All_cryptos"
@@ -165,11 +165,13 @@ class CryptoPortfolio:
 
         # scrap each coin of the coins list
         for i, coin in enumerate(self.coins):
-            print(i)
             if i % 25 == 0 and i != 0:
                 print("sleeping for 1 min...")
                 time.sleep(60)
-            df = algos.scrap_coin(coin, f"{coin}_all_time")  # scraps the selected coins
+            # scraps the selected coins
+            df = algos.scrap_coin(coin, f"{coin}_all_time")
+            # time.sleep(10)
+            print(i+1)
             cryptos_list.append(df["Close"])  # keep the closing value column
             self.market_cap.append(df["Market Cap"])  # append the historic data of MC for each coin
 

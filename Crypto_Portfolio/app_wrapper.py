@@ -1,8 +1,8 @@
 import pandas as pd
 from datetime import datetime
 
-from src.cryptorama import CryptoPortfolio
-from coincost_scrapping import top_coins
+from Crypto_Portfolio.src.cryptorama import CryptoPortfolio
+from Crypto_Portfolio.coincost_scrapping import top_coins
 
 
 def run_app(inputs_dict):
@@ -54,7 +54,7 @@ def run_app(inputs_dict):
                                         _cov_method=inputs_dict["cov_method"],
                                         _obj_function=inputs_dict["obj_function"],
                                         _compounding=inputs_dict["compounding"],
-                                        _scrap=False)
+                                        _scrap=inputs_dict["scrap"])
 
     print(cyrptos_instance.portfolio_from_past)
 
@@ -65,7 +65,7 @@ def run_app(inputs_dict):
                                         _cov_method=inputs_dict["cov_method"],
                                         _obj_function=inputs_dict["obj_function"],
                                         _compounding=inputs_dict["compounding"],
-                                        _scrap=False)
+                                        _scrap=inputs_dict["scrap"])
 
     print(f"\n{cyrptos_instance.portfolio}")
 
@@ -105,7 +105,7 @@ def calculate_profit(inputs):
                  dictionary of optimized portfolios on different validation days.
         :rtype: Tuple[float, Dict[str, float], Dict[str, pandas.DataFrame]]
     """
-    df = inputs["data"]
+    # df = inputs["data"]
     _top_100 = inputs["top_100"]
     _n_coins = inputs["n_coins"]
     _mu_method = inputs["mu_method"]
@@ -125,7 +125,7 @@ def calculate_profit(inputs):
         try:
             crypto_class.validate_from_past_specific_dates(_n_coins, int(n_days), sell_day, _mu_method, _cov_method,
                                                            _obj_function, compounding)
-            date = df.iloc[n_days].name
+            date = crypto_class.df_market_cap.iloc[n_days].name
 
             results[date] = crypto_class.p_l_specific
             portf[date] = crypto_class.portfolio_from_past_specific
@@ -201,9 +201,9 @@ def convert_date_to_number(date_latest_update, wanted_date):
 
     Example:
      convert_date_to_number("11/05/2019", "30/06/2019")
-    50
+    -50
      convert_date_to_number("01/01/2020", "15/02/2020")
-    45
+    -45
     """
     # Convert the date strings to datetime objects
     date_latest_update = datetime.strptime(date_latest_update, "%d/%m/%Y")
