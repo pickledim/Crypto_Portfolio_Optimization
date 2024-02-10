@@ -34,6 +34,7 @@ def run_app(inputs_dict):
         "top_hundred": inputs_dict["top_100"],
         "_budget": inputs_dict["budget"],
         "_n_coins": inputs_dict["n_coins"],
+        "remove_shitcoins": inputs_dict["remove_shitcoins"],
         "save_dir": inputs_dict["save_dir"]
 
     }
@@ -46,7 +47,7 @@ def run_app(inputs_dict):
         cyrptos_instance.get_prices_df()
         cyrptos_instance.get_market_cap_df()
 
-    print(f"\nValidation of optimized portfolio from {inputs_dict['n_days']} days before\n")
+    # print(f"\nValidation of optimized portfolio from {inputs_dict['n_days']} days before\n")
 
     cyrptos_instance.validate_from_past(_n_coins=inputs_dict["n_coins"],
                                         _n_days=inputs_dict["n_days"],
@@ -56,9 +57,9 @@ def run_app(inputs_dict):
                                         _compounding=inputs_dict["compounding"],
                                         _scrap=inputs_dict["scrap"])
 
-    print(cyrptos_instance.portfolio_from_past)
+    # display(from_dataframe(cyrptos_instance.portfolio_from_past))
 
-    print(f"\nCurrent optimized portfolio \n")
+    # print(f"\nCurrent optimized portfolio \n")
 
     cyrptos_instance.optimize_portfolio(_n_coins=inputs_dict["n_coins"],
                                         _mu_method=inputs_dict["mu_method"],
@@ -67,7 +68,7 @@ def run_app(inputs_dict):
                                         _compounding=inputs_dict["compounding"],
                                         _scrap=inputs_dict["scrap"])
 
-    print(f"\n{cyrptos_instance.portfolio}")
+    # print(f"\n{from_dataframe(cyrptos_instance.portfolio)}")
 
     return cyrptos_instance
 
@@ -107,6 +108,7 @@ def calculate_profit(inputs):
     """
     # df = inputs["data"]
     _top_100 = inputs["top_100"]
+    _remove_shitcoins = inputs["remove_shitcoins"]
     _n_coins = inputs["n_coins"]
     _mu_method = inputs["mu_method"]
     _cov_method = inputs["cov_method"]
@@ -117,7 +119,7 @@ def calculate_profit(inputs):
     compounding = inputs["compounding"]
     _save_dir = inputs["save_dir"]
 
-    crypto_class = CryptoPortfolio(_top_100, _budget, _n_coins, _save_dir)
+    crypto_class = CryptoPortfolio(_top_100, _budget, _n_coins, _remove_shitcoins, _save_dir)
     results = {}
     portf = {}
 
@@ -262,6 +264,7 @@ if __name__ == '__main__':
     inputs_1coins = {
         "top_100": True,
         "n_coins": 1,
+        "remove_shitcoins": True,
         "budget": 100,
         "scrap": False,
         "hodl": True,

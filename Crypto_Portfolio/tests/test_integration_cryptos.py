@@ -18,7 +18,7 @@ def tmpdir(tmpdir_factory):
 # Fixture to create an instance of the Cryptos class before each test function
 @pytest.fixture
 def cryptos_instance(tmpdir):
-    return CryptoPortfolio(top_hundred=True, _budget=10000, _n_coins=5, save_dir=tmpdir)
+    return CryptoPortfolio(top_hundred=True, _budget=10000, _n_coins=5, remove_shitcoins=True, save_dir=tmpdir)
 
 
 # Test case for the __init__ method
@@ -119,7 +119,8 @@ def test_post_pros_pipeline():
     _obj_function = "sharpe"
     _compounding = True
 
-    cryptos_instance = CryptoPortfolio(top_hundred=True, _budget=10000, _n_coins=5, save_dir="tests/data")
+    cryptos_instance = CryptoPortfolio(top_hundred=True, _budget=10000, _n_coins=5, remove_shitcoins=False,
+                                       save_dir="tests/data")
     cryptos_instance.post_pros_pipeline(_n_coins, _n_days, _mu_method, _cov_method, _obj_function, _compounding)
 
     # Add assertions to check if the 'portfolio_from_past' and 'portfolio' DataFrames are not empty

@@ -14,7 +14,7 @@ from Crypto_Portfolio.params import BASE_DIR
 base_dir = BASE_DIR
 
 
-def remove_unwanted_coins(coins_list):
+def remove_unwanted_coins(coins_list, remove_shitcoins):
     """
     Remove unwanted coins from the list of coins.
     This function removes stablecoins, shitty coins, and coins that cannot be bought.
@@ -30,7 +30,8 @@ def remove_unwanted_coins(coins_list):
     shitty_coins = ["SHIB", "DOGE", "XDC", "LEO", "BNB"]
 
     coins_list = algos.remove_coins(stablecoins, coins_list)
-    # coins_list = algos.remove_coins(shitty_coins, coins_list)
+    if remove_shitcoins:
+        coins_list = algos.remove_coins(shitty_coins, coins_list)
 
     return coins_list
 
@@ -86,7 +87,7 @@ class CryptoPortfolio:
         :meth run_all: Run all the steps of the portfolio optimization process.
     """
 
-    def __init__(self, top_hundred, _budget, _n_coins, save_dir):
+    def __init__(self, top_hundred, _budget, _n_coins, remove_shitcoins,save_dir):
         """
         Initialize the Cryptos portfolio management object.
 
@@ -117,6 +118,7 @@ class CryptoPortfolio:
         self.save_dir = save_dir
         self.budget = _budget
         self._n_coins = _n_coins
+        self.remove_shitcoins = remove_shitcoins
         self.top_hundred = top_hundred
 
         self.p_l = float()
@@ -171,7 +173,7 @@ class CryptoPortfolio:
             # scraps the selected coins
             df = algos.scrap_coin(coin, f"{coin}_all_time")
             # time.sleep(10)
-            print(i+1)
+            print(f"{i+1}. {coin} data collected")
             cryptos_list.append(df["Close"])  # keep the closing value column
             self.market_cap.append(df["Market Cap"])  # append the historic data of MC for each coin
 
@@ -261,7 +263,7 @@ class CryptoPortfolio:
         self.selected_coins_of_past = list(coins.index)  # store the names in a list
 
         # remove the stable coins, the shitty coins and the ones that you cannot buy
-        self.selected_coins_of_past = remove_unwanted_coins(self.selected_coins_of_past)
+        self.selected_coins_of_past = remove_unwanted_coins(self.selected_coins_of_past, self.remove_shitcoins)
 
         coin_list = self.df_prices.columns.tolist()
         coins = list(set(coin_list).intersection(self.selected_coins_of_past))
@@ -347,7 +349,7 @@ class CryptoPortfolio:
         self.selected_coins_of_past = list(coins.index)  # store the names in a list
 
         # remove the stable coins, the shitty coins and the ones that you cannot buy
-        self.selected_coins_of_past = remove_unwanted_coins(self.selected_coins_of_past)
+        self.selected_coins_of_past = remove_unwanted_coins(self.selected_coins_of_past, self.remove_shitcoins)
 
         coin_list = self.df_prices.columns.tolist()
         coins = list(set(coin_list).intersection(self.selected_coins_of_past))
@@ -409,7 +411,7 @@ class CryptoPortfolio:
         self.selected_coins = list(coins.index)
 
         # remove the stable coins, the shitty coins and the ones that you cannot buy
-        self.selected_coins = remove_unwanted_coins(self.selected_coins)
+        self.selected_coins = remove_unwanted_coins(self.selected_coins, self.remove_shitcoins)
 
         coin_list = self.df_prices.columns.tolist()
         coins = list(set(coin_list).intersection(self.selected_coins))
