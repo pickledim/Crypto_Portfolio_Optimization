@@ -1,5 +1,8 @@
 import pytest
+
+import numpy as np
 from Crypto_Portfolio.app_wrapper import *
+from pandas.testing import assert_frame_equal
 
 
 @pytest.fixture
@@ -8,6 +11,27 @@ def crypto_df():
     df.set_index("Date", inplace=True)
 
     return df
+
+
+@pytest.fixture
+def sample_inputs():
+    return {
+        "top_100": True,
+        "n_coins": 5,
+        "remove_shitcoins": True,
+        "budget": 100,
+        "scrap": False,
+        "hodl": True,
+        "compounding": False,
+        "start_date": "19/04/2023",
+        "DCA": 3,
+        "sell_date": None,
+        "mu_method": 'mean',
+        "cov_method": 'exp',
+        "obj_function": 'quadratic',
+        "save_dir": "./tests/data"
+    }
+
 
 # Test run_app function
 def test_run_app():
@@ -31,26 +55,19 @@ def test_run_app():
 
 
 # Test calculate_profit function
-def test_calculate_profit(crypto_df):
-    inputs = {
-        "data": crypto_df,  # replace df_prices with your DataFrame containing historical daily returns
-        "top_100": True,
-        "n_coins": 10,
-        "remove_shitcoins": False,
-        "mu_method": "mean",
-        "cov_method": "sample",
-        "obj_function": "sharpe",
-        "budget": 100,
-        "days_vector": [180, 365],
-        "sell_day": 180,
-        "compounding": True,
-        "save_dir": "./tests/data"
-    }
+def test_calculate_profit(sample_inputs):
 
-    result = calculate_profit(inputs)
+    expected_pl_sample = np.array([-2.325604860185444, -1.693885839726309, -4.859998663575225])
+    expected_portfolio = pd.DataFrame({"Coin": "ETH",
+                                       "Amount": 100.0,
+                                       "n_coins": 0.052843},
+                                      index=[0])
+    total_pl_sample, pl_sample, portf_sample = calculate_profit(sample_inputs)
 
-    assert isinstance(result, tuple)
-    assert len(result) == 3
+    assert isinstance(pl_sample, dict)
+    assert isinstance(portf_sample, dict)
+    assert np.isclose(np.array(list(pl_sample.values())), expected_pl_sample).all()
+    assert_frame_equal(portf_sample[list(portf_sample.keys())[1]], expected_portfolio)
 
 
 # Test check_coins function
@@ -94,7 +111,3 @@ def test_get_df_from_dict():
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (2, 4)
-
-# Add more test cases as needed for each function
-
-

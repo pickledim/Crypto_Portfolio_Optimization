@@ -1,8 +1,20 @@
 import pandas as pd
-from datetime import datetime
+import datetime
+from dateutil.relativedelta import relativedelta
 
 from Crypto_Portfolio.src.cryptorama import CryptoPortfolio
 from Crypto_Portfolio.coincost_scrapping import top_coins
+import Crypto_Portfolio.src.generic_algorithms as algos
+
+
+def convert_date_format(date_str):
+    # Convert string to datetime object
+    date_obj = datetime.datetime.strptime(date_str, "%d/%m/%Y")
+
+    # Convert datetime object to string in YYYY-MM-DD format
+    date_formatted = date_obj.strftime("%Y-%m-%d")
+
+    return algos.convert_to_datetime(date_formatted)
 
 
 def run_app(inputs_dict):
@@ -73,7 +85,7 @@ def run_app(inputs_dict):
     return cyrptos_instance
 
 
-def calculate_profit(inputs):
+def calculate_profit(inputs, verbosity=False):
     """
     Calculate the profit and optimized portfolios for a given DataFrame and parameters.
 
@@ -101,6 +113,10 @@ def calculate_profit(inputs):
                        - 'save_dir': The directory path to save the resulting data and figures.
         :type inputs: dict
 
+        :param verbosity: A boolean that allows to print more info on the console.
+
+        :type verbosity: bool
+
     Returns:
         :return: A tuple containing the total profit, a dictionary of profits on different validation days, and a
                  dictionary of optimized portfolios on different validation days.
@@ -114,29 +130,57 @@ def calculate_profit(inputs):
     _cov_method = inputs["cov_method"]
     _obj_function = inputs["obj_function"]
     _budget = inputs["budget"]
-    _n_days_vector = inputs["days_vector"]
-    sell_day = inputs["sell_day"]
+    buy_day = inputs["DCA"]
+    start_date = convert_date_format(inputs["start_date"])
     compounding = inputs["compounding"]
     _save_dir = inputs["save_dir"]
 
     crypto_class = CryptoPortfolio(_top_100, _budget, _n_coins, _remove_shitcoins, _save_dir)
-    results = {}
+
+    if "sell_at_last_date" in inputs:
+        sell_at_last_date = inputs["sell_at_last_date"]
+    else:
+        sell_at_last_date = False
+
+    if inputs["sell_date"] is None:
+        df = pd.read_csv(f"{_save_dir}/{crypto_class.csv_name}.csv", nrows=1, index_col=0)
+        sell_date = algos.convert_to_datetime(df.index.values[0])
+    else:
+        sell_date = convert_date_format(inputs["sell_date"])
+
+    pl_data = {}
     portf = {}
 
-    for n_days in _n_days_vector:
-        try:
-            crypto_class.validate_from_past_specific_dates(_n_coins, int(n_days), sell_day, _mu_method, _cov_method,
-                                                           _obj_function, compounding)
-            date = crypto_class.df_market_cap.iloc[n_days].name
+    specific_date = start_date.replace(day=buy_day)
 
-            results[date] = crypto_class.p_l_specific
+    years = relativedelta(sell_date, specific_date).years
+    months = years * 12 + relativedelta(sell_date, specific_date).months
+
+    dates_of_months = []
+    for i in range(months):
+        date_of_month = specific_date + relativedelta(months=i + 1)
+        dates_of_months.append(date_of_month.strftime("%Y-%m-%d"))
+
+    for day in dates_of_months:
+        try:
+            crypto_class.validate_from_past_specific_dates(_n_coins, day, sell_date, _mu_method, _cov_method,
+                                                           _obj_function, compounding)
+            date = crypto_class.df_market_cap.loc[day].name
+
+            pl_data[date] = crypto_class.p_l_specific
             portf[date] = crypto_class.portfolio_from_past_specific
         except Exception as e:
             pass
 
-    p_l = sum(results.values())
+    p_l = sum(pl_data.values())
 
-    return p_l, results, portf
+    if sell_at_last_date and verbosity:
+        inv = _budget * len(dates_of_months)
+        print(f'\nInvestment: {inv} $')
+        print(f'Final Profit: {round(p_l, 2)} $')  # + p_l_100
+        print(f'Final Profit: {round(p_l / inv * 100, 2)} %\n')  # + p_l_100
+
+    return p_l, pl_data, portf
 
 
 def check_coins(portfolio):
@@ -208,8 +252,8 @@ def convert_date_to_number(date_latest_update, wanted_date):
     -45
     """
     # Convert the date strings to datetime objects
-    date_latest_update = datetime.strptime(date_latest_update, "%d/%m/%Y")
-    wanted_date = datetime.strptime(wanted_date, "%d/%m/%Y")
+    date_latest_update = datetime.datetime.strptime(date_latest_update, "%d/%m/%Y")
+    wanted_date = datetime.datetime.strptime(wanted_date, "%d/%m/%Y")
 
     # Calculate the time delta
     delta_buy = date_latest_update - wanted_date
@@ -263,17 +307,19 @@ if __name__ == '__main__':
     # Inputs
     inputs_1coins = {
         "top_100": True,
-        "n_coins": 1,
+        "n_coins": 5,
         "remove_shitcoins": True,
         "budget": 100,
         "scrap": False,
         "hodl": True,
         "compounding": False,
-        "n_days": 180,
+        "start_date": "19/04/2023",
+        "DCA": 3,
+        "sell_date": None,
         "mu_method": 'mean',
         "cov_method": 'exp',
         "obj_function": 'quadratic',
-        "save_dir": "./new_data"
+        "save_dir": "./tests/data"
     }
 
-    portfolios_1c = run_app(inputs_1coins)
+    p_l, results, portf = calculate_profit(inputs_1coins)

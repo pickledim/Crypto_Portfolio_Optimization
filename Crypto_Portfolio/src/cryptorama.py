@@ -2,7 +2,6 @@ import os
 import re
 import time
 import pickle
-from datetime import timedelta
 
 import pandas as pd
 
@@ -291,7 +290,7 @@ class CryptoPortfolio:
         # get profit_loss
         self.portfolio_from_past, self.p_l = algos.get_p_l(self.portfolio_from_past, prices_past, prices_now)
 
-    def validate_from_past_specific_dates(self, _n_coins, buy_date, sell_date, _mu_method, _cov_method, _obj_function,
+    def validate_from_past_specific_dates(self, _n_coins, buy_timestamp, sell_timestamp, _mu_method, _cov_method, _obj_function,
                                           _compounding, _scrap=False):
         """
         Perform portfolio optimization based on historical data within specific buy and sell dates.
@@ -339,11 +338,7 @@ class CryptoPortfolio:
                                                                                  algos.convert_to_datetime(date_str))
         df_mc = self.df_market_cap.copy()
 
-        current_date = df_mc.iloc[0].name
-        buy_timestamp = current_date - timedelta(days=buy_date)
-        sell_timestamp = current_date - timedelta(days=sell_date)
-
-        df_365 = df_mc.loc[buy_timestamp:, :].iloc[0, :].T  # take the market cap of only that day
+        df_365 = df_mc.loc[buy_timestamp, :]  # take the market cap of only that day
         df_365.dropna(inplace=True)
         coins = df_365.nlargest(_n_coins, )  # keep the n largest coins in terms of market cap
         self.selected_coins_of_past = list(coins.index)  # store the names in a list
@@ -355,12 +350,12 @@ class CryptoPortfolio:
         coins = list(set(coin_list).intersection(self.selected_coins_of_past))
 
         # self.df_prices = self.df_prices[coins]
-        self.df_prices_specific = self.df_prices.loc[buy_timestamp:, coins]
+        self.df_prices_specific = self.df_prices.loc[:buy_timestamp, coins]
         # take the prices up to n_day
         # self.df_prices_specific2 = self.df_prices.loc[sell_timestamp:, :]
 
-        sell_prices = self.df_prices.loc[sell_timestamp, :]
-        buy_prices = self.df_prices.loc[buy_timestamp, :]
+        sell_prices = self.df_prices.loc[sell_timestamp, coins]
+        buy_prices = self.df_prices.loc[buy_timestamp, coins]
 
         self.df_prices_specific.index = self.df_prices_specific.index.strftime("%Y-%m-%d")
 
