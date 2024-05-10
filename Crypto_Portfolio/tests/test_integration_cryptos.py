@@ -69,16 +69,28 @@ def test_optimize_portfolio(cryptos_instance):
 def test_specific_dates(cryptos_instance):
     cryptos_instance.get_prices_df()
     cryptos_instance.get_market_cap_df()
-    cryptos_instance.validate_from_past_specific_dates(_n_coins=5, buy_date=365*3, sell_date=365, _mu_method="mean",
-                                                       _cov_method="sample", _obj_function="sharpe", _compounding=False,
+    cryptos_instance.validate_from_past_specific_dates(_n_coins=5,
+                                                       buy_timestamp="27/07/2020",
+                                                       sell_timestamp="27/07/2021",
+                                                       _mu_method="mean",
+                                                       _cov_method="sample",
+                                                       _obj_function="sharpe",
+                                                       _compounding=False,
                                                        _scrap=False)
     assert isinstance(cryptos_instance.portfolio_from_past_specific, pd.DataFrame)
     assert isinstance(cryptos_instance.p_l_specific, float)
 
 
 def test_run_all(cryptos_instance):
-    cryptos_instance.run_all(file="tests/data/cryptos_sample.txt", _n_coins=5, _n_days=365*3, sell_date=365,
-                             _mu_method="mean", _cov_method="sample", _obj_function="sharpe", _compounding=True,
+    cryptos_instance.run_all(file="tests/data/cryptos_sample.txt",
+                             _n_coins=5,
+                             _n_days=365*3,
+                             buy_timestamp="27/07/2020",
+                             sell_timestamp="27/07/2022",
+                             _mu_method="mean",
+                             _cov_method="sample",
+                             _obj_function="sharpe",
+                             _compounding=True,
                              _scrap=False)
 
     # Add assertions to validate the entire pipeline functionality

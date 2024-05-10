@@ -290,8 +290,8 @@ class CryptoPortfolio:
         # get profit_loss
         self.portfolio_from_past, self.p_l = algos.get_p_l(self.portfolio_from_past, prices_past, prices_now)
 
-    def validate_from_past_specific_dates(self, _n_coins, buy_timestamp, sell_timestamp, _mu_method, _cov_method, _obj_function,
-                                          _compounding, _scrap=False):
+    def validate_from_past_specific_dates(self, _n_coins, buy_timestamp, sell_timestamp, _mu_method, _cov_method,
+                                          _obj_function,  _compounding, _scrap=False):
         """
         Perform portfolio optimization based on historical data within specific buy and sell dates.
 
@@ -303,11 +303,11 @@ class CryptoPortfolio:
             :param _n_coins: Number of coins to consider for portfolio optimization.
             :type _n_coins: int
 
-            :param buy_date: Number of days from the current date to the buy date for the historical data.
-            :type buy_date: int
+            :param buy_timestamp: buy date for the historical data.
+            :type buy_timestamp: str
 
-            :param sell_date: Number of days from the current date to the sell date for the historical data.
-            :type sell_date: int
+            :param sell_timestamp: sell date for the historical data.
+            :type sell_timestamp: str
 
             :param _mu_method: Method for calculating expected returns. Possible values: "mean", "exp", "capm".
             :type _mu_method: str
@@ -453,7 +453,15 @@ class CryptoPortfolio:
         self.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_function, _compounding=_compounding,
                                 _scrap=False)
 
-    def run_all(self, file, _n_coins, _n_days, sell_date, _mu_method, _cov_method, _obj_function, _compounding=False,
+    def run_all(self, file,
+                _n_coins,
+                _n_days,
+                buy_timestamp,
+                sell_timestamp,
+                _mu_method,
+                _cov_method,
+                _obj_function,
+                _compounding=False,
                 _scrap=True):
         """
         Run the entire pipeline for cryptocurrency data analysis and portfolio optimization.
@@ -471,8 +479,8 @@ class CryptoPortfolio:
         self.get_market_cap_df()
         self.optimize_portfolio(_n_coins, _mu_method, _cov_method, _obj_function, _compounding=False, _scrap=True)
         self.validate_from_past(_n_coins, _n_days, _mu_method, _cov_method, _obj_function, _compounding, _scrap=True)
-        self.validate_from_past_specific_dates(_n_coins, _n_days, sell_date, _mu_method, _cov_method, _obj_function,
-                                               _compounding, _scrap=True)
+        self.validate_from_past_specific_dates(_n_coins, buy_timestamp, sell_timestamp, _mu_method, _cov_method,
+                                               _obj_function, _compounding, _scrap=True)
 
 
 if __name__ == "__main__":

@@ -135,8 +135,8 @@ def test_post_pros_pipeline(cryptos_instance):
 
 def test_specific_dates(cryptos_instance):
     n_coins = 10
-    buy_date = 365 * 3
-    sell_date = 365 * 2
+    buy_date = "27/07/2020"
+    sell_date = "27/07/2021"
     mu_method = "mean"
     cov_method = "exp"
     obj_function = "sharpe"
