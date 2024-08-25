@@ -1,10 +1,12 @@
 import pandas as pd
 import datetime
+import pickle
 from dateutil.relativedelta import relativedelta
 
-from Crypto_Portfolio.src.cryptorama import CryptoPortfolio
+from Crypto_Portfolio.src.cryptorama import CryptoPortfolio, remove_unwanted_coins
 from Crypto_Portfolio.coincost_scrapping import top_coins
 import Crypto_Portfolio.src.generic_algorithms as algos
+import Crypto_Portfolio.coincost_scrapping as cs
 
 
 def convert_date_format(date_str):
@@ -85,6 +87,76 @@ def run_app(inputs_dict):
     return cyrptos_instance
 
 
+def run_app_patch(inputs_coins):
+
+    _budget = inputs_coins["budget"]
+    _mu_method = inputs_coins["mu_method"]
+    _cov_method = inputs_coins["cov_method"]
+    _obj_function = inputs_coins["obj_function"]
+    compounding = inputs_coins["compounding"]
+
+    coins = top_coins(inputs_coins["n_coins"], inputs_coins["save_dir"])
+
+    # pickle_file_path = "/Users/dimitrisglenis/Documents/Cryptos_Updated/Crypto_Portfolio/top_coins_short_list.pickle"# inputs_dict["file"]
+    # with open(pickle_file_path, 'rb') as file:
+    #     coins = pickle.load(file)
+
+    remove_shitcoins = inputs_coins["remove_shitcoins"]
+
+    # coins = algos.regex_coins(file)
+    # remove the stable coins, the shitty coins and the ones that you cannot buy
+    wanted_coins = remove_unwanted_coins(coins, remove_shitcoins)
+    wanted_coins = wanted_coins[:inputs_coins["n_coins"]]
+    legacy_data = pd.read_csv(f"./legacy_data/All_cryptos.csv", index_col=0)
+    legacy_data_subset = legacy_data[wanted_coins]
+    # legacy_data_subset
+
+    end_date = datetime.datetime.now()
+    start_date = algos.convert_to_datetime(legacy_data_subset.index.max())
+    delta = end_date - start_date
+    days = delta.days
+    if days <= 90:
+        legacy_data = pd.read_csv(f"./legacy_data/All_cryptos_only_cmc.csv", index_col=0)
+        legacy_data_subset = legacy_data[wanted_coins]
+        start_date = algos.convert_to_datetime(legacy_data_subset.index.max())
+
+    legacy_data_subset.index = pd.to_datetime(legacy_data_subset.index, format="%Y-%m-%d")
+    legacy_data_subset.index = legacy_data_subset.index.strftime("%d-%m-%Y")
+
+    processor = cs.CoinGeckoDataProcessor(wanted_coins, start_date, end_date)
+    processor.fetch_and_process_all()
+    new_data = processor.df_prices
+    new_data.index = new_data.index.strftime("%d-%m-%Y")
+
+    data = pd.concat([new_data, legacy_data_subset])
+    data.index = pd.to_datetime(data.index, format="%d-%m-%Y")
+    # data.index = data.index.strftime("%d-%m-%Y")
+    data = data.sort_index(ascending=False)
+
+    portfolio, mu, weights = algos.portfolio_optimization(data,
+                                                          wanted_coins,
+                                                          _budget,
+                                                          _mu_method,
+                                                          _cov_method,
+                                                          _obj_function,
+                                                          _compounding=compounding)
+
+    coins_list = list()
+    amount_list = list()
+    n_coins_list = list()
+    for coin, amount in portfolio.items():
+        price = data[coin].iloc[0]
+        n_coins_bought = amount / price
+        coins_list.append(coin)
+        amount_list.append(amount)
+        n_coins_list.append(n_coins_bought)
+
+    portfolio = pd.DataFrame({"Coin": coins_list, "Amount": amount_list, "n_coins": n_coins_list})
+    portfolio.sort_values(by=["Amount"], ascending=False, inplace=True)
+
+    return portfolio
+
+
 def calculate_profit(inputs, verbosity=False):
     """
     Calculate the profit and optimized portfolios for a given DataFrame and parameters.
@@ -157,8 +229,9 @@ def calculate_profit(inputs, verbosity=False):
     months = years * 12 + relativedelta(sell_date, specific_date).months
 
     dates_of_months = []
+    dates_of_months.append(specific_date.strftime("%Y-%m-%d"))
     for i in range(months):
-        date_of_month = specific_date + relativedelta(months=i + 1)
+        date_of_month = specific_date + relativedelta(months=i+1)
         dates_of_months.append(date_of_month.strftime("%Y-%m-%d"))
 
     for day in dates_of_months:
@@ -307,7 +380,7 @@ if __name__ == '__main__':
     # Inputs
     inputs_1coins = {
         "top_100": True,
-        "n_coins": 5,
+        "n_coins": 20,
         "remove_shitcoins": True,
         "budget": 100,
         "scrap": False,
@@ -321,5 +394,5 @@ if __name__ == '__main__':
         "obj_function": 'quadratic',
         "save_dir": "./tests/data"
     }
-
-    p_l, results, portf = calculate_profit(inputs_1coins)
+    df = run_app_patch(inputs_1coins)
+    # p_l, results, portf = calculate_profit(inputs_1coins)

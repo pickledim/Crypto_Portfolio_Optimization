@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 
@@ -28,6 +29,16 @@ def convert_to_datetime(date_str):
     return datetime.strptime(date_str, "%Y-%m-%d")
 
 
+def convert_datetime_to_unix(date_string):
+    date_object = datetime.strptime(date_string, "%d-%m-%Y")
+    return int(date_object.timestamp())
+
+
+def convert_unix_to_date(unix_timestamp):
+    date_object = datetime.fromtimestamp(unix_timestamp)
+    return date_object.strftime("%d-%m-%Y")
+
+
 def remove_coins(to_remove, selected_coins):
     """
     Removes specified coins from the selected coins list.
@@ -51,6 +62,24 @@ def remove_coins(to_remove, selected_coins):
             pass
 
     return selected_coins
+
+
+def regex_coins(file):
+    """
+    Extracts crypto coins from a file using regex.
+
+    Parameters:
+        :param file: The name of the file to extract coins from.
+        :type file: str
+    """
+
+    with open(file, "r") as file1:
+        lines = file1.readlines()
+
+    cryptos = [line.strip() for line in lines if re.match(r"[A-Z]+[A-Z]+[A-Z]*[\s]+", line)]
+    cryptos2 = [crypto for crypto in cryptos if " " not in crypto]
+
+    return list(set(cryptos2))
 
 
 def scrap_coin(coin, coin_csv_name):

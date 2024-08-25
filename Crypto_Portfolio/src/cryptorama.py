@@ -86,7 +86,7 @@ class CryptoPortfolio:
         :meth run_all: Run all the steps of the portfolio optimization process.
     """
 
-    def __init__(self, top_hundred, _budget, _n_coins, remove_shitcoins,save_dir):
+    def __init__(self, top_hundred, _budget, _n_coins, remove_shitcoins, save_dir):
         """
         Initialize the Cryptos portfolio management object.
 
@@ -493,16 +493,16 @@ if __name__ == "__main__":
     drop = False
     budget = 100
     hodl = True
-    scrap = False
+    scrap = True
     save_to = "./new_data"
-    crypto_class_20c = CryptoPortfolio(top_100, budget, n_coins, save_dir=save_to)
+    crypto_class_20c = CryptoPortfolio(top_100, budget, n_coins, remove_shitcoins=True, save_dir=save_to)
 
-    # crypto_class_20c.get_prices_df()
-    # crypto_class_20c.get_market_cap_df()
-    # crypto_class_20c.validate_from_past(n_coins, n_days, mu_method, cov_method, obj_function, drop, scrap)
+    crypto_class_20c.get_prices_df()
+    crypto_class_20c.get_market_cap_df()
+    crypto_class_20c.validate_from_past(n_coins, n_days, mu_method, cov_method, obj_function, drop, scrap)
     crypto_class_20c.optimize_portfolio(n_coins, mu_method, cov_method, obj_function, drop, scrap)
-    print(f"\nn_coins={n_coins}\n")
-    print(crypto_class_20c.portfolio)
+    # print(f"\nn_coins={n_coins}\n")
+    # print(crypto_class_20c.portfolio)
 
     # n_coins = 10
     # crypto_class_10c = Cryptos(top_100, budget, n_coins, hodl)

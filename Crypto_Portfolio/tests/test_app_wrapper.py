@@ -57,10 +57,10 @@ def test_run_app():
 # Test calculate_profit function
 def test_calculate_profit(sample_inputs):
 
-    expected_pl_sample = np.array([-2.325604860185444, -1.693885839726309, -4.859998663575225])
+    expected_pl_sample = np.array([2.7652964254775916, -2.325604860185444, -1.693885839726309, -4.859998663575225])
     expected_portfolio = pd.DataFrame({"Coin": "ETH",
                                        "Amount": 100.0,
-                                       "n_coins": 0.052843},
+                                       "n_coins": 0.052503},
                                       index=[0])
     total_pl_sample, pl_sample, portf_sample = calculate_profit(sample_inputs)
 
