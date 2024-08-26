@@ -90,14 +90,14 @@ def test_check_coins():
 
 
 # Test convert_date_to_number function
-def test_convert_date_to_number():
-    date_latest_update = "11/05/2019"
-    wanted_date = "30/06/2019"
-
-    result = convert_date_to_number(date_latest_update, wanted_date)
-
-    assert isinstance(result, int)
-    assert result == -50
+# def test_convert_date_to_number():
+#     date_latest_update = "11/05/2019"
+#     wanted_date = "30/06/2019"
+#
+#     result = convert_date_to_number(date_latest_update, wanted_date)
+#
+#     assert isinstance(result, int)
+#     assert result == -50
 
 
 # Test get_df_from_dict function

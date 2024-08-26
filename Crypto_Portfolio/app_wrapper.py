@@ -1,25 +1,15 @@
-import pandas as pd
 import datetime
-import pickle
+from typing import Tuple, Dict
+
+import pandas as pd
 from dateutil.relativedelta import relativedelta
 
-from Crypto_Portfolio.src.cryptorama import CryptoPortfolio, remove_unwanted_coins
-from Crypto_Portfolio.coincost_scrapping import top_coins
-import Crypto_Portfolio.src.generic_algorithms as algos
 import Crypto_Portfolio.coincost_scrapping as cs
+import Crypto_Portfolio.src.generic_algorithms as algos
+from Crypto_Portfolio.src.cryptorama import CryptoPortfolio, remove_unwanted_coins
 
 
-def convert_date_format(date_str):
-    # Convert string to datetime object
-    date_obj = datetime.datetime.strptime(date_str, "%d/%m/%Y")
-
-    # Convert datetime object to string in YYYY-MM-DD format
-    date_formatted = date_obj.strftime("%Y-%m-%d")
-
-    return algos.convert_to_datetime(date_formatted)
-
-
-def run_app(inputs_dict):
+def run_app(inputs_dict: dict) -> CryptoPortfolio:
     """
     Run the crypto market analysis and portfolio optimization using inputs from a dictionary.
 
@@ -53,15 +43,13 @@ def run_app(inputs_dict):
 
     }
     if inputs_dict["scrap"]:
-        top_coins(inputs_dict["n_coins"], inputs_dict["save_dir"])
+        cs.top_coins(inputs_dict["n_coins"], inputs_dict["save_dir"])
 
     cyrptos_instance = CryptoPortfolio(**class_inputs)
 
     if inputs_dict["scrap"]:
         cyrptos_instance.get_prices_df()
         cyrptos_instance.get_market_cap_df()
-
-    # print(f"\nValidation of optimized portfolio from {inputs_dict['n_days']} days before\n")
 
     cyrptos_instance.validate_from_past(_n_coins=inputs_dict["n_coins"],
                                         _n_days=inputs_dict["n_days"],
@@ -71,10 +59,6 @@ def run_app(inputs_dict):
                                         _compounding=inputs_dict["compounding"],
                                         _scrap=inputs_dict["scrap"])
 
-    # display(from_dataframe(cyrptos_instance.portfolio_from_past))
-
-    # print(f"\nCurrent optimized portfolio \n")
-
     cyrptos_instance.optimize_portfolio(_n_coins=inputs_dict["n_coins"],
                                         _mu_method=inputs_dict["mu_method"],
                                         _cov_method=inputs_dict["cov_method"],
@@ -82,12 +66,10 @@ def run_app(inputs_dict):
                                         _compounding=inputs_dict["compounding"],
                                         _scrap=inputs_dict["scrap"])
 
-    # print(f"\n{from_dataframe(cyrptos_instance.portfolio)}")
-
     return cyrptos_instance
 
 
-def run_app_patch(inputs_coins):
+def run_app_patch(inputs_coins: dict) -> pd.DataFrame:
 
     _budget = inputs_coins["budget"]
     _mu_method = inputs_coins["mu_method"]
@@ -95,21 +77,15 @@ def run_app_patch(inputs_coins):
     _obj_function = inputs_coins["obj_function"]
     compounding = inputs_coins["compounding"]
 
-    coins = top_coins(inputs_coins["n_coins"], inputs_coins["save_dir"])
-
-    # pickle_file_path = "/Users/dimitrisglenis/Documents/Cryptos_Updated/Crypto_Portfolio/top_coins_short_list.pickle"# inputs_dict["file"]
-    # with open(pickle_file_path, 'rb') as file:
-    #     coins = pickle.load(file)
+    coins = cs.top_coins(inputs_coins["n_coins"], inputs_coins["save_dir"])
 
     remove_shitcoins = inputs_coins["remove_shitcoins"]
 
-    # coins = algos.regex_coins(file)
     # remove the stable coins, the shitty coins and the ones that you cannot buy
     wanted_coins = remove_unwanted_coins(coins, remove_shitcoins)
     wanted_coins = wanted_coins[:inputs_coins["n_coins"]]
     legacy_data = pd.read_csv(f"./legacy_data/All_cryptos.csv", index_col=0)
     legacy_data_subset = legacy_data[wanted_coins]
-    # legacy_data_subset
 
     end_date = datetime.datetime.now()
     start_date = algos.convert_to_datetime(legacy_data_subset.index.max())
@@ -130,7 +106,6 @@ def run_app_patch(inputs_coins):
 
     data = pd.concat([new_data, legacy_data_subset])
     data.index = pd.to_datetime(data.index, format="%d-%m-%Y")
-    # data.index = data.index.strftime("%d-%m-%Y")
     data = data.sort_index(ascending=False)
 
     portfolio, mu, weights = algos.portfolio_optimization(data,
@@ -157,7 +132,7 @@ def run_app_patch(inputs_coins):
     return portfolio
 
 
-def calculate_profit(inputs, verbosity=False):
+def calculate_profit(inputs: dict, verbosity=False) -> Tuple[float, Dict[str, float], Dict[str, pd.DataFrame]]:
     """
     Calculate the profit and optimized portfolios for a given DataFrame and parameters.
 
@@ -203,7 +178,7 @@ def calculate_profit(inputs, verbosity=False):
     _obj_function = inputs["obj_function"]
     _budget = inputs["budget"]
     buy_day = inputs["DCA"]
-    start_date = convert_date_format(inputs["start_date"])
+    start_date = algos.convert_date_format(inputs["start_date"])
     compounding = inputs["compounding"]
     _save_dir = inputs["save_dir"]
 
@@ -218,7 +193,7 @@ def calculate_profit(inputs, verbosity=False):
         df = pd.read_csv(f"{_save_dir}/{crypto_class.csv_name}.csv", nrows=1, index_col=0)
         sell_date = algos.convert_to_datetime(df.index.values[0])
     else:
-        sell_date = convert_date_format(inputs["sell_date"])
+        sell_date = algos.convert_date_format(inputs["sell_date"])
 
     pl_data = {}
     portf = {}
@@ -228,8 +203,7 @@ def calculate_profit(inputs, verbosity=False):
     years = relativedelta(sell_date, specific_date).years
     months = years * 12 + relativedelta(sell_date, specific_date).months
 
-    dates_of_months = []
-    dates_of_months.append(specific_date.strftime("%Y-%m-%d"))
+    dates_of_months = [specific_date.strftime("%Y-%m-%d")]
     for i in range(months):
         date_of_month = specific_date + relativedelta(months=i+1)
         dates_of_months.append(date_of_month.strftime("%Y-%m-%d"))
@@ -256,7 +230,7 @@ def calculate_profit(inputs, verbosity=False):
     return p_l, pl_data, portf
 
 
-def check_coins(portfolio):
+def check_coins(portfolio: dict):
     """
     Check the total number of coins for each cryptocurrency in the given portfolio.
 
@@ -278,14 +252,14 @@ def check_coins(portfolio):
                 'Coin': ['BNB'],
                 'Amount': [100.0],
                 'n_coins': [4.75072]
-            }),
+                }),
             '2019-06-10': pd.DataFrame({
                 'Coin': ['BNB'],
                 'Amount': [100.0],
                 'n_coins': [3.118692]
             }),
             # ...
-        })
+            })
     Output:
         BNB 7.869412
     """
@@ -299,41 +273,6 @@ def check_coins(portfolio):
         print(data["Coin"].iloc[0], data["n_coins"].sum())
 
     result_df.groupby("Coin").apply(get_total_coins)
-
-
-def convert_date_to_number(date_latest_update, wanted_date):
-    """
-    Convert date strings to a time delta in days.
-
-    This function takes two date strings in the format "%d/%m/%Y" and calculates the time delta between them. The result
-    is returned as an integer representing the number of days between the two dates.
-
-    Parameters:
-        :param date_latest_update: The latest date in the format "%d/%m/%Y".
-        :type date_latest_update: str
-        :param wanted_date: The desired date in the format "%d/%m/%Y".
-        :type wanted_date: str
-
-    Returns:
-        :return: The time delta between the two dates in days.
-        :rtype: int
-
-    Example:
-     convert_date_to_number("11/05/2019", "30/06/2019")
-    -50
-     convert_date_to_number("01/01/2020", "15/02/2020")
-    -45
-    """
-    # Convert the date strings to datetime objects
-    date_latest_update = datetime.datetime.strptime(date_latest_update, "%d/%m/%Y")
-    wanted_date = datetime.datetime.strptime(wanted_date, "%d/%m/%Y")
-
-    # Calculate the time delta
-    delta_buy = date_latest_update - wanted_date
-
-    # Convert the time delta to a float representing the number of days
-    delta = int(delta_buy.total_seconds() / (24 * 60 * 60))
-    return delta
 
 
 def get_df_from_dict(data_dict):
@@ -394,5 +333,5 @@ if __name__ == '__main__':
         "obj_function": 'quadratic',
         "save_dir": "./tests/data"
     }
-    df = run_app_patch(inputs_1coins)
+    df_sample = run_app_patch(inputs_1coins)
     # p_l, results, portf = calculate_profit(inputs_1coins)

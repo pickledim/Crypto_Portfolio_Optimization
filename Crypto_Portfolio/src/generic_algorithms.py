@@ -14,29 +14,92 @@ from pypfopt.efficient_frontier import EfficientFrontier
 from cryptocmd import CmcScraper
 
 
-def convert_to_datetime(date_str):
+def convert_to_datetime(date_str: str) -> datetime:
     """
     Converts a date string to a datetime object.
 
     Parameters:
-        :param date_str: The input date string in the format "%Y-%m-%d".
-        :type date_str: str
+        date_str (str): The input date string in the format "%Y-%m-%d".
 
     Returns:
-        :return: A datetime object representing the input date.
-        :rtype: datetime.datetime
+        datetime: A datetime object representing the input date.
     """
     return datetime.strptime(date_str, "%Y-%m-%d")
 
 
-def convert_datetime_to_unix(date_string):
+def convert_datetime_to_unix(date_string: str) -> int:
+    """
+    Converts a date string to a UNIX timestamp.
+
+    Parameters:
+        date_string (str): The input date string in the format "%d-%m-%Y".
+
+    Returns:
+        int: The corresponding UNIX timestamp (in seconds).
+    """
     date_object = datetime.strptime(date_string, "%d-%m-%Y")
     return int(date_object.timestamp())
 
 
-def convert_unix_to_date(unix_timestamp):
+def convert_unix_to_date(unix_timestamp: int) -> str:
+    """
+    Converts a UNIX timestamp to a formatted date string.
+
+    Parameters:
+        unix_timestamp (int): The input UNIX timestamp.
+
+    Returns:
+        str: The corresponding date in the format "%d-%m-%Y".
+    """
     date_object = datetime.fromtimestamp(unix_timestamp)
     return date_object.strftime("%d-%m-%Y")
+
+
+def convert_date_to_number(date_latest_update: str, wanted_date: str) -> int:
+    """
+    Convert date strings to a time delta in days.
+
+    This function takes two date strings in the format "%d/%m/%Y" and calculates the time delta between them. The result
+    is returned as an integer representing the number of days between the two dates.
+
+    Parameters:
+        :param date_latest_update: The latest date in the format "%d/%m/%Y".
+        :type date_latest_update: str
+        :param wanted_date: The desired date in the format "%d/%m/%Y".
+        :type wanted_date: str
+
+    Returns:
+        :return: The time delta between the two dates in days.
+        :rtype: int
+
+    Example:
+     convert_date_to_number("11/05/2019", "30/06/2019")
+    -50
+     convert_date_to_number("01/01/2020", "15/02/2020")
+    -45
+    """
+
+    # Convert the date strings to datetime objects
+    date_latest_update = datetime.strptime(date_latest_update, "%d/%m/%Y")
+    wanted_date = datetime.strptime(wanted_date, "%d/%m/%Y")
+
+    # Calculate the time delta
+    delta_buy = date_latest_update - wanted_date
+
+    # Convert the time delta to a float representing the number of days
+    delta = int(delta_buy.total_seconds() / (24 * 60 * 60))
+
+    return delta
+
+
+def convert_date_format(date_str: str) -> datetime:
+    # Convert string to datetime object
+    date_obj = datetime.strptime(date_str, "%d/%m/%Y")
+
+    # Convert datetime object to string in YYYY-MM-DD format
+    date_formatted = date_obj.strftime("%Y-%m-%d")
+
+    return convert_to_datetime(date_formatted)
 
 
 def remove_coins(to_remove, selected_coins):
